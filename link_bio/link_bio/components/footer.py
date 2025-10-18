@@ -30,7 +30,13 @@ def footer() -> rx.Component:
             ),
             margin_top="100px",
             width="100%",
-            
+        ),
+        rx.vstack(
+            rx.center(
+                rx.image(
+                    src="delta.png",
+                ),
+            ),
         ),
         # === SECCIÓN INFERIOR: INFORMACIÓN Y CONTACTO ===
         rx.box(
@@ -121,27 +127,6 @@ def footer() -> rx.Component:
         margin_right="5px", 
         _hover={"text_decoration": "underline"}, 
     ),
-    
-    # 3. Separador: /
-    rx.text(
-        " / ",
-        color="black",
-        font_size="12px",
-        display="inline",
-    ),
-    
-    # 4. Link: BOTÓN DE ARREPENTIMIENTO
-    rx.link(
-        "BOTÓN DE ARREPENTIMIENTO",
-        href="#",  
-        color="black",
-        font_size="12px",
-        font_weight="bold",
-        text_decoration="none",
-        display="inline",
-        _hover={"text_decoration": "underline"}, 
-    ),
-    
     padding_y="3px",      
     width="100%",
     align="center",       

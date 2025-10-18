@@ -6,4 +6,7 @@
   <url>
     <loc>http://localhost:3000/products</loc>
   </url>
+  <url>
+    <loc>http://localhost:3000/arrepentimiento</loc>
+  </url>
 </urlset>

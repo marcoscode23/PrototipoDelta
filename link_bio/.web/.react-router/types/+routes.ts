@@ -13,6 +13,9 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/arrepentimiento": {
+    params: {};
+  };
   "/products": {
     params: {};
   };
@@ -26,7 +29,11 @@ type Pages = {
 type RouteFiles = {
   "root.jsx": {
     id: "root";
-    page: "/" | "/products" | "/*";
+    page: "/" | "/arrepentimiento" | "/products" | "/*";
+  };
+  "routes/[arrepentimiento]._index.jsx": {
+    id: "routes/[arrepentimiento]._index";
+    page: "/arrepentimiento";
   };
   "routes/[products]._index.jsx": {
     id: "routes/[products]._index";

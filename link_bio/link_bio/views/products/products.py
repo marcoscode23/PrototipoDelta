@@ -87,7 +87,7 @@ def account_links() -> rx.Component:
 # ---- PRODUCTOS ----
 def products() -> rx.Component:
     productos = [
-        ("VANSSKNUSKOOL.png", "VANS KNU SKOOL #793", "$50.000", "$60.500 con efectivo (en el local)"),
+        ("VANSKNUSKOOL.png", "VANS KNU SKOOL #793", "$50.000", "$60.500 con efectivo (en el local)"),
         ("vans u hylane.png", "VANS U HYLANE", "$80.000", "$60.500 con efectivo (en el local)"),
         ("puma 180.png", "PUMA", "$90.000", "$67.500 con efectivo (en el local)"),
         ("SAMBAXLG.png", "SAMBA XLG", "$80.000", "$60.000 con efectivo (en el local)"),
@@ -310,7 +310,6 @@ def products() -> rx.Component:
             justify="center",
         ),
 
-# --- Elementos de la línea de Defensa del Consumidor y Botón de Arrepentimiento ---
     # Texto fijo: DEFENSA DE LAS Y LOS CONSUMIDORES. PARA RECLAMOS 
     rx.center(
     rx.text(
@@ -336,22 +335,19 @@ def products() -> rx.Component:
         _hover={"text_decoration": "underline"}, 
     ),
     ),
-    
     # 3. Separador: /
-    rx.center(
     rx.text(
         " / ",
         color="black",
         font_size="12px",
         display="inline",
     ),
-    ),
     
     # 4. Link: BOTÓN DE ARREPENTIMIENTO
     rx.center(
     rx.link(
         "BOTÓN DE ARREPENTIMIENTO",
-        href="#",  
+        href="/arrepentimiento",  
         color="black",
         font_size="12px",
         font_weight="bold",
@@ -368,4 +364,3 @@ def products() -> rx.Component:
     row_gap="40px",
     bg="white",
     ),
- 
