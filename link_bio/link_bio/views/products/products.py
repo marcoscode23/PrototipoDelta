@@ -107,7 +107,14 @@ def products() -> rx.Component:
         ("JORDAN1LOWXTRAVISSCOTT.png","JORDAN 1 LOW X TRAVIS SCOTT #769","$90.000","$67.500 con efectivo (en el local)"),
         ("DOBLEBSKY.png","DOBLED SKY","$90.000","$67.500 con efectivo (en el local)"),
         ("JORDAN1MIDBROWN.png","JORDAN 1 MID BROWN","$90.000","$67.500 con efectivo (en el local)"),
-        ("VANSUUPLAND.png","VANS U UPLAND","$90.000","$67.500 con efectivo (en el local)"),
+        ("SAMBAXLGG.png","SAMBA XLG","$90.000","$67.500 con efectivo (en el local)"),
+        ("NEWBALANCE9060.png","NEW BALANCE 9060","$90.000","$67.500 con efectivo (en el local)"),
+        ("FORUMLOW871.png","FORUM LOW 871","$90.000","$67.500 con efectivo (en el local)"),
+        ("CAMPUSXBADBUNNYY.png","CAMPUS X BAD BUNNY","$90.000","$67.500 con efectivo (en el local)"),
+        ("SAMBA869.png","SAMBA 869","$90.000","$67.500 con efectivo (en el local)"),
+        ("DROPSTEPLOW854.png","DROP STEP LOW 853","$90.000","$67.500 con efectivo (en el local)"),
+        ("OSIRIS870.png","OSIRIS 870","$90.000","$67.500 con efectivo (en el local)"),
+        ("JORDAN1821.png","JORDAN 1 #821","$90.000","$67.500 con efectivo (en el local)"),
     ]
     
     return rx.box(
@@ -161,7 +168,6 @@ def products() -> rx.Component:
         align="center",
         ),
 
-        # GRID de productos
         rx.center(
             *[
                 rx.box(
@@ -194,9 +200,9 @@ def products() -> rx.Component:
                             margin_top="40px",
                         ),
                     ),
-                    max_width="200px",
-                    width=["45%","30%","18%"],
-                    mix_width="220",
+                    max_width="400px",
+                    width=("calc(45%)","calc(38%)"),
+                    min_width="220",
                     bg="transparent",  # sin fondo
                     border="none",     # sin borde
                     box_shadow="none", # sin sombra
@@ -205,11 +211,11 @@ def products() -> rx.Component:
                 )
                 for src, nombre, precio, efectivo in productos  
             ],
-            justify="center",  
+            justify="center",
             align="start",  
             wrap="wrap",       
-            spacing="9",
-            row_gap="10px",    
+            spacing="2",
+            row_gap="5px",    
             width="100%",
             padding_y="70px",
         ),
