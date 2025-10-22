@@ -66,17 +66,17 @@ def arrepentimiento() -> rx.Component:
                 ),
 
                 # Campos del formulario
-                rx.text("NOMBRE", font_weight="bold", font_size="0.9em"),
+                rx.text("NOMBRE", font_weight="bold", font_size="0.9em",color="black"),
                 rx.input(placeholder="Tu nombre", border="1px solid black", width="100%",color="black"),
 
                 rx.text("EMAIL", font_weight="bold", font_size="0.9em"),
-                rx.input(placeholder="Tu correo electrónico", border="1px solid black", width="100%"),
+                rx.input(placeholder="Tu correo electrónico", border="1px solid black", width="100%",color="black"),
 
                 rx.text("TELÉFONO (OPCIONAL)",font_weight="bold",font_size="0.85em"),
-                rx.input(placeholder="Teléfono", border="1px solid black", width="100%"),
+                rx.input(placeholder="Teléfono", border="1px solid black", width="100%",color="black"),
 
                 rx.text("MENSAJE (OPCIONAL)",font_weight="bold", font_size="0.85em"),
-                rx.text_area(placeholder="Escribí tu mensaje...", border="1px solid black", width="100%", height="100px"),
+                rx.text_area(placeholder="Escribí tu mensaje...", border="1px solid black", width="100%", height="100px",color="black"),
 
                 # Botón para enviar
                 rx.button(

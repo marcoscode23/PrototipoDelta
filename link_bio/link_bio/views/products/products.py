@@ -1,5 +1,5 @@
 import reflex as rx
-
+from link_bio.views.products.detalle_page import normalize_nombre, IMAGENES_EXTRA
 
 #---- BUSCADOR ----
 def search_bar() -> rx.Component:
@@ -83,19 +83,22 @@ def account_links() -> rx.Component:
         width="100%",           
     ),
 
+# Función para normalizar nombre de producto
+def normalize_nombre(nombre: str):
+    return nombre.upper().replace(" ", "_").replace("#","").replace("-","_")
 
 # ---- PRODUCTOS ----
 def products() -> rx.Component:
     productos = [
         ("VANSKNUSKOOL.png", "VANS KNU SKOOL #793", "$50.000", "$60.500 con efectivo (en el local)"),
-        ("vans u hylane.png", "VANS U HYLANE", "$80.000", "$60.500 con efectivo (en el local)"),
+        ("VANSUHYLANE.png", "VANS U HYLANE", "$80.000", "$60.500 con efectivo (en el local)"),
         ("puma 180.png", "PUMA", "$90.000", "$67.500 con efectivo (en el local)"),
         ("SAMBAXLG.png", "SAMBA XLG", "$80.000", "$60.000 con efectivo (en el local)"),
         ("AIRFORCE.png", "AIR FORCE", "$80.000", "$60.000 con efectivo (en el local)"),
         ("CAMPUSXBADBUNNY.png","CAMPUS X BAD BUNNY","$90.000","$67.500 con efectivo (en el local)"),
         ("SAMBA795.png"," SAMBA #795","$90.000","$80.500 con efectivo (en el local)"),
         ("DOBLEBDARK669.jpg"," DOBLEB DARK #669","$90.000","$67.500 con efectivo (en el local)"),
-        ("ADI 2000.png","ADI 2000","$110.000","$92.500 con efectivo (en el local)"),
+        ("ADI 2000.png","ADI 2000","$90.000","$63.500 con efectivo (en el local)"),
         ("CAMPUSXBADBUNNY783.png","CAMPUS X BADBUNNY #783 ","$90.000","$67.500 con efectivo (en el local)"),
         ("SBDUNK778.png"," SB DUNK #778","$90.000","$67.500 con efectivo (en el local)"),
         ("JORDAN1-823.png"," JORDAN 1 #823","$90.000","$67.500 con efectivo (en el local)"),
@@ -107,10 +110,10 @@ def products() -> rx.Component:
         ("JORDAN1LOWXTRAVISSCOTT.png","JORDAN 1 LOW X TRAVIS SCOTT #769","$90.000","$67.500 con efectivo (en el local)"),
         ("DOBLEBSKY.png","DOBLED SKY","$90.000","$67.500 con efectivo (en el local)"),
         ("JORDAN1MIDBROWN.png","JORDAN 1 MID BROWN","$90.000","$67.500 con efectivo (en el local)"),
-        ("SAMBAXLGG.png","SAMBA XLG","$90.000","$67.500 con efectivo (en el local)"),
+        ("SAMBAXLGG.png","SAMBA XLG","$90.000","$60.000 con efectivo (en el local)"),
         ("NEWBALANCE9060.png","NEW BALANCE 9060","$90.000","$67.500 con efectivo (en el local)"),
         ("FORUMLOW871.png","FORUM LOW 871","$90.000","$67.500 con efectivo (en el local)"),
-        ("CAMPUSXBADBUNNYY.png","CAMPUS X BAD BUNNY","$90.000","$67.500 con efectivo (en el local)"),
+        ("CAMPUSXBADBUNNYY.png","CAMPUS X BAD BUNNY","$72.000","$54.500 con efectivo (en el local)"),
         ("SAMBA869.png","SAMBA 869","$90.000","$67.500 con efectivo (en el local)"),
         ("DROPSTEPLOW854.png","DROP STEP LOW 853","$90.000","$67.500 con efectivo (en el local)"),
         ("OSIRIS870.png","OSIRIS 870","$90.000","$67.500 con efectivo (en el local)"),
@@ -172,7 +175,16 @@ def products() -> rx.Component:
             *[
                 rx.box(
                     rx.vstack(
-                                rx.image(src=src, width="200px", height="250px"),
+                        rx.link(
+                                rx.image(
+                                    src=src, 
+                                    width="200px", 
+                                    height="250px",
+                                    border_radius="8px",
+                                    _hover={"transform": "scale(1.05)", "cursor": "pointer"}
+                                    ),
+                                    href=f"/detalle/{normalize_nombre(nombre)}"
+                        ),
                                 rx.text(nombre, color="black"),
                                 rx.text(precio, color="black"),
                         rx.box(

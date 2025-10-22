@@ -5,7 +5,7 @@ from link_bio.views.header.header import header
 from link_bio.views.button.button import button
 from link_bio.views.products.products import products
 from link_bio.views.arrepentimiento.arrepentimiento import arrepentimiento
-
+from link_bio.views.products.detalle_page import detalle_page
 
 
 
@@ -42,10 +42,11 @@ def index() -> rx.Component:
 
 
 
-
 app = rx.App()
 app.add_page(index, route="/")
 app.add_page(products, route="/products")
 app.add_page(arrepentimiento, route="/arrepentimiento")
+app.add_page(detalle_page, route="/detalle/[nombre]")
+
 app._compile()
 

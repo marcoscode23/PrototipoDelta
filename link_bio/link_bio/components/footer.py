@@ -46,7 +46,7 @@ def footer() -> rx.Component:
                     rx.text("NAVEGACIÓN", weight="bold", color="white", font_size="15px"),
                     rx.link("Inicio", href="/", color="white"),
                     rx.link("Productos", href="/products", color="white"),
-                    rx.link("Contacto", href="https://wa.me/543794258727?text=Hola%20Delta%20Store%20👋%2C%20quiero%20consultar%20por%20unas%20zapatillas.", color="white"),
+                    rx.link("Contacto", href="https://api.whatsapp.com/send/?phone=543794258727&text=Hola+Delta+Store+%EF%BF%BD%2C+quiero+consultar+por+unas+zapatillas.&type=phone_number&app_absent=0", color="white"),
                     spacing="2",
                     align="start",
                 ),
