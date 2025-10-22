@@ -7,7 +7,7 @@ def normalize_nombre(nombre: str):
 
 # Diccionario local con imágenes extra
 IMAGENES_EXTRA = {
-    "VANS_KNU_SKOOLL_793": ["link_bio/.web/public/CASUALDOBLEBCOCOA.png", "link_bio/.web/public/CONVERSEALLSTAR717.png"],
+    "VANS_KNU_SKOOLL_793": ["VANSKNUSKOOLL.png", "AIRFORCE.png"],
     "VANS_U_HYLANE": ["VANSUHYLANE.png", "VANSUHYLANE.png"],
     "PUMA": ["OSIRIS870.png", "OSIRIS870.png"],
     "SAMBA_XLG": ["SAMBAXLG.png", "SAMBAXLGG.png"],
