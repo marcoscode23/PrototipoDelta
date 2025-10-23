@@ -53,7 +53,7 @@ def account_links() -> rx.Component:
         rx.hstack(
             rx.link(
                 "CREAR CUENTA",
-                href="#",
+                href="/register",
                 color="black",
                 font_size="10px",
                 text_decoration="none",
@@ -62,7 +62,7 @@ def account_links() -> rx.Component:
             rx.text("|", color="black", font_size="10px"),
             rx.link(
                 "INICIAR SESIÓN",
-                href="#",
+                href="/login",
                 color="black",
                 font_size="10px",
                 text_decoration="none",

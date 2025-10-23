@@ -9,4 +9,13 @@
   <url>
     <loc>http://localhost:3000/arrepentimiento</loc>
   </url>
+  <url>
+    <loc>http://localhost:3000/login</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/register</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/reset_password</loc>
+  </url>
 </urlset>

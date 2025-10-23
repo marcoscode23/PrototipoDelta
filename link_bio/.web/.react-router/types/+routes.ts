@@ -21,7 +21,16 @@ type Pages = {
   "/arrepentimiento": {
     params: {};
   };
+  "/reset_password": {
+    params: {};
+  };
   "/products": {
+    params: {};
+  };
+  "/register": {
+    params: {};
+  };
+  "/login": {
     params: {};
   };
   "/*": {
@@ -34,7 +43,7 @@ type Pages = {
 type RouteFiles = {
   "root.jsx": {
     id: "root";
-    page: "/" | "/detalle/:nombre" | "/arrepentimiento" | "/products" | "/*";
+    page: "/" | "/detalle/:nombre" | "/arrepentimiento" | "/reset_password" | "/products" | "/register" | "/login" | "/*";
   };
   "routes/[detalle].$[nombre]._index.jsx": {
     id: "routes/[detalle].$[nombre]._index";
@@ -44,9 +53,21 @@ type RouteFiles = {
     id: "routes/[arrepentimiento]._index";
     page: "/arrepentimiento";
   };
+  "routes/[reset_password]._index.jsx": {
+    id: "routes/[reset_password]._index";
+    page: "/reset_password";
+  };
   "routes/[products]._index.jsx": {
     id: "routes/[products]._index";
     page: "/products";
+  };
+  "routes/[register]._index.jsx": {
+    id: "routes/[register]._index";
+    page: "/register";
+  };
+  "routes/[login]._index.jsx": {
+    id: "routes/[login]._index";
+    page: "/login";
   };
   "routes/_index.jsx": {
     id: "routes/_index";
