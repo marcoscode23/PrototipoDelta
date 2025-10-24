@@ -36,7 +36,7 @@ def reset_password() -> rx.Component:
             rx.text("Vamos a enviarte un email para que puedas cambiar tu contraseña.", font_size="13px", margin_bottom="8px"),
             rx.box(
                 rx.text("EMAIL", font_weight="bold"),
-                rx.input(placeholder="ej.: tunombre@email.com", width="100%"),
+                rx.input(placeholder="ej.: tunombre@email.com", width="100%",color="black"),
                 rx.button("ENVIAR EMAIL", bg="black", color="white", width="100%", margin_top="10px",_hover={"transform": "scale(1.05)", "cursor": "pointer"}),
                 align="start",
                 width="100%",
