@@ -2,18 +2,89 @@ import reflex as rx
 
 class CartState(rx.State):
     show_modal: bool = False
+    show_cart_drawer: bool = False
     selected_product: str = ""
     selected_image: str = ""
+    selected_price: float = 0.0
+    selected_size: str = ""
+    quantity: int = 0
+    cart_items: list[dict] = []
     
+    # === Propiedad computada: cantidad total en el carrito ===
+    @rx.var
+    def total_items(self) -> int:
+        return len(self.cart_items)
 
-    def toggle_cart_modal(self, e: rx.event.PointerEventInfo | None = None, nombre: str = "", imagen: str = ""):
+    def toggle_cart_modal(self, e: rx.event.PointerEventInfo | None = None, nombre: str = "", imagen: str = "", precio: str = ""):
         self.show_modal = not self.show_modal
         if nombre:
             self.selected_product = nombre
         if imagen:
             self.selected_image = imagen
+        if precio:
+            # ✅ Convertimos precio a float aunque venga como "$80.000"
+            if isinstance(precio, str):
+                precio = precio.replace("$", "").replace(".", "").replace(",", ".").strip()
+            try:
+                self.selected_price = float(precio)
+            except ValueError:
+                self.selected_price = 0.0
+    
+    # 🧮 Función para calcular el total
+    def get_total(self) -> float:
+        total = 0.0
+        for item in self.cart_items:
+            # si precio viene como string tipo "$80.000", lo limpiamos
+            precio = (
+                float(str(item["precio"]).replace("$", "").replace(".", "").replace(",", "."))
+                if isinstance(item["precio"], str)
+                else float(item["precio"])
+            )
+            total += precio * int(item["cantidad"])
+        return total
+    
+    # ✅ NUEVA PROPIEDAD REACTIVA (automáticamente se actualiza)
+    @rx.var
+    def total_text(self) -> str:
+        # Usamos el formato de miles y luego reemplazamos la coma por el punto.
+        total_float = self.get_total()
+        total_entero = int(total_float)
+        formatted_total = f"{total_entero:,}"
+        formatted_total = formatted_total.replace(",", ".")
+        return f"Total: ${formatted_total}"
+    
+    
+    def select_size(self, talle: int):
+        self.selected_size = talle
+    
+    def set_quantity(self,value: str):
+        try:
+            self.quantity = max(1, int(value))
+        except ValueError:
+            self.quantity = 0
 
+    def add_to_cart(self):
+        if not self.selected_product or not self.selected_image:
+            return
+        item = {
+            "nombre": self.selected_product,
+            "imagen": self.selected_image,
+            "precio": self.selected_price,
+            "talle": self.selected_size or "-",
+            "cantidad": self.quantity or 1,
+        }
+        self.cart_items.append(item)
+        self.show_modal = False
+        self.show_cart_drawer = True
 
+    # --- Eliminar producto del carrito ---
+    def remove_from_cart(self, index: int):
+        if 0 <= index < len(self.cart_items):
+            self.cart_items.pop(index)
+    
+    # --- Mostrar / ocultar carrito lateral ---  
+    def toggle_cart_drawer(self):
+        self.show_cart_drawer = not self.show_cart_drawer
 
 # ==== MODAL DE CARRITO ====
 def cart_modal() -> rx.Component:
@@ -30,6 +101,7 @@ def cart_modal() -> rx.Component:
                 bg="rgba(0, 0, 0, 0.5)",
                 z_index="1000",
                 transition="opacity 0.3s ease-in-out",
+                on_click=CartState.toggle_cart_modal,
             ),
             # Contenedor modal
             rx.center(
@@ -39,7 +111,7 @@ def cart_modal() -> rx.Component:
                         rx.image(
                             src=CartState.selected_image,
                             width="500px",
-                            height="500px",
+                            height="400px",
                             border_radius="10px",
                             box_shadow="0 4px 10px rgba(0,0,0,0.2)",
                         ),
@@ -51,6 +123,13 @@ def cart_modal() -> rx.Component:
                             color="#333",
                             margin_top="10px",
                         ),
+                        rx.text(
+                            CartState.selected_price,
+                            font_size="18px",
+                            color="#DAA520",
+                            font_weight="bold",
+                            margin_bottom="10px",
+                        ),
                         # Talles disponibles
                         rx.hstack(
                             *[
@@ -60,12 +139,38 @@ def cart_modal() -> rx.Component:
                                     border_radius="8px",
                                     padding="5px 10px",
                                     cursor="pointer",
+                                    bg=rx.cond(
+                                        CartState.selected_size == talle,
+                                        "#DAA520",
+                                        "transparent",
+                                    ),
+                                    color=rx.cond(
+                                        CartState.selected_size == talle,
+                                        "white",
+                                        "black",
+                                    ),
+                                    on_click=lambda: CartState.select_size(talle),
                                     _hover={"bg": "#DAA520", "color": "white"},
                                 )
                                 for talle in [38, 39, 40, 41, 42, 43]
                             ],
                             spacing="3",
                             justify="center",
+                            margin_top="10px",
+                        ),
+                        # --- NUEVO: campo de cantidad ---
+                        rx.hstack(
+                            rx.text("Cantidad:", font_size="16px", color="#333"),
+                            rx.input(
+                                value=CartState.quantity,
+                                width="60px",
+                                text_align="center",
+                                border="1px solid #ccc",
+                                border_radius="6px",
+                                on_change=CartState.set_quantity,
+                            ),
+                            justify="center",
+                            spacing="2",
                             margin_top="10px",
                         ),
                         # Botón grande añadir al carrito
@@ -80,7 +185,7 @@ def cart_modal() -> rx.Component:
                             border_radius="10px",
                             margin_top="15px",
                             _hover={"transform": "scale(1.05)", "bg": "#c49c15"},
-                            on_click=CartState.toggle_cart_modal,
+                            on_click=CartState.add_to_cart,
                         ),
                         # Link para ver más detalles
                         rx.link(
@@ -117,6 +222,8 @@ def cart_modal() -> rx.Component:
                 transform="translateX(-50%)",
                 animation="slideDown 0.4s ease forwards",
                 z_index="1001",
+                max_height="90vh",
+                overflow_y="auto",
             ),
             # Animación CSS
             style={
@@ -127,7 +234,229 @@ def cart_modal() -> rx.Component:
             },
         ),
         rx.box(),  # nada si está cerrado
+    ),
+
+# ===================== CARRITO LATERAL =====================
+def cart_drawer() -> rx.Component:
+    return rx.cond(
+        CartState.show_cart_drawer,
+        rx.box(
+            # Fondo oscuro
+            rx.box(
+                position="fixed",
+                top="0",
+                left="0",
+                width="100%",
+                height="100%",
+                bg="rgba(0,0,0,0.5)",
+                z_index="1100",
+                on_click=CartState.toggle_cart_drawer,
+            ),
+            # Panel lateral
+            rx.box(
+                rx.vstack(
+                    rx.hstack(
+                        rx.text(
+                            "CARRITO DE COMPRAS",
+                            font_weight="bold",
+                            font_size="20px",
+                            color="black",
+                        ),
+                        rx.button(
+                            "cerrar",
+                            bg="#DAA520",
+                            color="black",
+                            _hover={"transform": "scale(1.05)", "cursor": "pointer"},
+                            on_click=CartState.toggle_cart_drawer,
+                        ),
+                        justify="between",
+                        width="100%",
+                    ),
+                    # AÑADIDO: Textos PRODUCTO y SUBTOTAL
+                    rx.hstack(
+                        rx.text("PRODUCTO", font_size="14px", font_weight="bold", color="black"),
+                        rx.spacer(),
+                        rx.text("SUBTOTAL", font_size="14px", font_weight="bold", color="black"),
+                        width="100%",
+                        padding_x="10px",
+                        margin_top="10px",
+                    ),
+                    rx.scroll_area(
+                        rx.vstack(
+                            rx.foreach(
+                                CartState.cart_items,
+                                lambda item, i: rx.hstack(
+                                    rx.hstack(
+                                    rx.image(
+                                        src=item["imagen"],
+                                        width="70px",
+                                        height="70px",
+                                        border_radius="10px",
+                                    ),
+                                    rx.vstack(
+                                        rx.text(item["nombre"], font_weight="bold",color="black"),
+                                        rx.text(
+                                            f"Talle: {item.get('talle', '—')}",
+                                            font_size="13px",
+                                            color="#555",
+                                        ),
+                                        rx.text(
+                                            f"Cantidad: {item['cantidad']}",
+                                            font_size="13px",
+                                            color="#555",
+                                        ),
+                                        rx.text(
+                                            item["precio"],
+                                            color="#DAA520",
+                                            font_weight="bold",
+                                        ),
+                                        align_items="start",
+                                        spacing="1",
+                                    ),
+                                        rx.spacer(),
+                                        rx.icon_button(
+                                            "trash",
+                                            color_scheme="red",
+                                            size='2',
+                                            on_click=lambda _, idx=i: CartState.remove_from_cart(idx),
+                                        )                                      
+                                    ),
+                                    spacing="4",
+                                    align="center",
+                                    padding_y="10px",
+                                    border_bottom="1px solid #eee",
+                                ),
+                            ),
+                            spacing="2",
+                        ),
+                        max_height="60vh",
+                        overflow_y="auto",
+                    ),
+# === SECCIÓN SUBTOTAL Y ENVÍO ===
+rx.box(
+    # Subtotal sin envío
+    rx.hstack(
+        rx.text("Subtotal (sin envío):", font_weight="bold", color="black"),
+        rx.text(
+            CartState.total_text,
+            font_weight="bold",
+            color="#000",
+            margin_left="auto",
+        ),
+        width="100%",
+        justify_content="between",
+        align_items="center",
+        margin_top="15px",
+    ),
+
+    # Título medios de envío
+    rx.hstack(
+        rx.icon(tag="truck", color="#000"),
+        rx.text("Medios de envío", font_weight="bold", color="black"),
+        spacing="2",
+        margin_top="10px",
+    ),
+
+    # Campo de código postal + botón calcular
+    rx.hstack(
+        rx.input(
+            placeholder="Tu código postal",
+            width="60%",
+            border_radius="8px",
+            border="1px solid #ccc",
+            padding="5px",
+            bg="white",
+            color="black",
+            
+        ),
+        rx.button(
+            "CALCULAR",
+            bg="#000",
+            color="#fff",
+            padding_x="12px",
+            padding_y="5px",
+            border_radius="8px",
+            cursor="pointer",
+            _hover={"background_color": "#222"},
+        ),
+        spacing="2",
+        margin_top="8px",
+    ),
+
+    # Link “No sé mi código postal”
+    rx.link(
+        "No sé mi código postal",
+        href="https://www.correoargentino.com.ar/formularios/cpa",
+        font_size="13px",
+        color="#000",
+        text_decoration="underline",
+        margin_top="4px",
+    ),
+
+    # Opción “Nuestro local”
+    rx.hstack(
+        rx.icon(tag="store", color="#000"),
+        rx.text("Nuestro local", font_weight="bold", color="black"),
+        spacing="2",
+        margin_top="15px",
+    ),
+
+    # Dirección del local
+    rx.box(
+        rx.text(
+            "Delta Store  Av. Circunvalación Santiago Marzo Este 868 entre Argentino Valle e Independencia (Santa Rosa, La Pampa) – Lunes a Viernes 9:30 a 12:30 / 16:00 a 21:00 – Sábado 11 a 19 hs",
+            font_size="13px",
+            color="#000",
+        ),
+        rx.text("Gratis", font_weight="bold", color="black", margin_top="4px"),
+        border="1px solid #ccc",
+        border_radius="10px",
+        padding="10px",
+        margin_top="5px",
+    ),
+                    #TOTAL DE LA COMPRA
+                    rx.text(
+                        CartState.total_text,
+                        font_weight="bold",
+                        font_size="18px",
+                        color="#DAA520",
+                        margin_top="10px",
+                    ),
+                    rx.button(
+                        "INICIAR COMPRA",
+                        bg="#DAA520",
+                        color="black",
+                        width="100%",
+                        border_radius="8px",
+                        padding_y="12px",
+                        font_weight="bold",
+                        _hover={"transform": "scale(1.05)", "cursor": "pointer"},
+                    ),
+                    spacing="4",
+                    align="start",
+                    padding="20px",
+                ),
+                position="fixed",
+                top="0",
+                right="0",
+                width="400px",
+                height="100vh",
+                bg="white",
+                box_shadow="-2px 0 10px rgba(0,0,0,0.3)",
+                z_index="1200",
+                animation="slideIn 0.4s ease forwards",
+            ),
+            style={
+                "@keyframes slideIn": {
+                    "from": {"right": "-400px"},
+                    "to": {"right": "0"},
+                }
+            },
+        ),
+        rx.box(),
     )
+)
+
 
 #---- BUSCADOR ----
 def search_bar() -> rx.Component:
@@ -138,7 +467,7 @@ def search_bar() -> rx.Component:
             width="250px",
             border_radius="10px",
             border_color="transparent",
-            bg="#444",
+            bg="#DAA520",
             _placeholder={"color": "white"},
             _focus={"border_color": "transparent","box_shadow":"0 0 0 2px #555"}
         ),
@@ -164,14 +493,21 @@ def account_links() -> rx.Component:
         rx.center(
             rx.button(
                     rx.icon(tag="shopping_cart"),
-                    rx.text(f"CARRITO ()"),
-                    bg="#A9A9A9",
+                    rx.text(
+                        rx.cond(
+                            CartState.total_items > 0,
+                            f"CARRITO ({CartState.total_items})",
+                            "CARRITO (0)",
+                        )
+                    ),
+                    bg="#DAA520",
                     color="white",
                     size="3",
                     width=["90%","40%"],
                     padding_x="10px",
                     border_radius="5px",
                     _hover={"bg": "#444"},
+                    on_click=CartState.toggle_cart_drawer,
                 ),
                 width="100%",       
                 justify="center",
@@ -337,7 +673,8 @@ def products() -> rx.Component:
                             color="white", 
                             bg="#DAA520",
                             _hover={"transform": "scale(1.05)"},
-                            on_click=lambda _: CartState.toggle_cart_modal(nombre=nombre, imagen=src),
+                            on_click=lambda _: CartState.toggle_cart_modal(nombre=nombre, imagen=src, precio=precio),
+                            
                         ),
                         spacing="3",
                         align="center",
@@ -428,7 +765,7 @@ rx.box(
                                 bg="#DAA520",
                                 color="white",
                                 _hover={"transform": "scale(1.05)"},
-                                on_click=lambda _: CartState.toggle_cart_modal(nombre),
+                                on_click=lambda _: CartState.toggle_cart_modal(nombre=nombre, imagen=src),
                             ),
                             rx.link(
                                 "Ver más detalle",
@@ -563,7 +900,10 @@ rx.box(
             ),
             width="100%",
         ),
-        cart_modal(),  # 👈 Montado aquí
+        cart_modal(),# 👈 Montado aquí
+        cart_drawer(),
+
+
         # === COPYRIGHT FINAL ===
         rx.center(
             rx.text("COPYRIGHT DELTA STORE - 2025. TODOS LOS DERECHOS RESERVADOS", color="black", font_size="12px"),
