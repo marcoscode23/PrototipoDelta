@@ -54,8 +54,8 @@ class CartState(rx.State):
         return f"Total: ${formatted_total}"
     
     
-    def select_size(self, talle: int):
-        self.selected_size = talle
+    def select_size(self, talle: int | str):
+        self.selected_size = str(talle)
     
     def set_quantity(self,value: str):
         try:
@@ -281,180 +281,199 @@ def cart_drawer() -> rx.Component:
                         padding_x="10px",
                         margin_top="10px",
                     ),
+                    # Lista de productos
                     rx.scroll_area(
                         rx.vstack(
                             rx.foreach(
                                 CartState.cart_items,
                                 lambda item, i: rx.hstack(
+                                    # === COLUMNA IZQUIERDA ===
                                     rx.hstack(
-                                    rx.image(
-                                        src=item["imagen"],
-                                        width="70px",
-                                        height="70px",
-                                        border_radius="10px",
+                                        rx.image(
+                                            src=item["imagen"],
+                                            width="70px",
+                                            height="70px",
+                                            border_radius="10px",
+                                            margin_left="10px",
+                                        ),
+                                        rx.vstack(
+                                            rx.text(item["nombre"], font_weight="bold", color="black"),
+                                            rx.text(
+                                                f"Talle: {item.get('talle', '—')}",
+                                                font_size="13px",
+                                                color="#555",
+                                            ),
+                                            rx.text(
+                                                f"Cantidad: {item['cantidad']}",
+                                                font_size="13px",
+                                                color="#555",
+                                            ),
+                                            align_items="start",
+                                            spacing="1",
+                                        ),
+                                        spacing="3",
                                     ),
+                                    rx.spacer(),
+                                    # === COLUMNA DERECHA (PRECIO + ELIMINAR) ===
                                     rx.vstack(
-                                        rx.text(item["nombre"], font_weight="bold",color="black"),
-                                        rx.text(
-                                            f"Talle: {item.get('talle', '—')}",
-                                            font_size="13px",
-                                            color="#555",
+                                        rx.hstack(
+                                            rx.text(
+                                                f"${item['precio']}",
+                                                color="#DAA520",
+                                                font_weight="bold",
+                                                font_size="15px",
+                                                margin_right="8px",
+                                            ),
+                                            rx.icon_button(
+                                                "trash",
+                                                color_scheme="red",
+                                                size="2",
+                                                on_click=lambda _, idx=i: CartState.remove_from_cart(idx),
+                                            ),
+                                            align="center",
                                         ),
-                                        rx.text(
-                                            f"Cantidad: {item['cantidad']}",
-                                            font_size="13px",
-                                            color="#555",
-                                        ),
-                                        rx.text(
-                                            item["precio"],
-                                            color="#DAA520",
-                                            font_weight="bold",
-                                        ),
-                                        align_items="start",
-                                        spacing="1",
+                                        margin_top="0px",  # 👈 baja el bloque debajo de SUBTOTAL
+                                        align_items="end",
+                                        padding_right="15px",
                                     ),
-                                        rx.spacer(),
-                                        rx.icon_button(
-                                            "trash",
-                                            color_scheme="red",
-                                            size='2',
-                                            on_click=lambda _, idx=i: CartState.remove_from_cart(idx),
-                                        )                                      
-                                    ),
+                                    # === ESTILO GENERAL DE CADA ITEM ===
                                     spacing="4",
-                                    align="center",
+                                    align="start",
                                     padding_y="10px",
                                     border_bottom="1px solid #eee",
+                                    width="100%",
+                                    justify="between",
                                 ),
                             ),
-                            spacing="2",
+                            spacing="7",
+                            width="100%"
                         ),
                         max_height="60vh",
                         overflow_y="auto",
                     ),
-# === SECCIÓN SUBTOTAL Y ENVÍO ===
-rx.box(
-    # Subtotal sin envío
-    rx.hstack(
-        rx.text("Subtotal (sin envío):", font_weight="bold", color="black"),
-        rx.text(
-            CartState.total_text,
-            font_weight="bold",
-            color="#000",
-            margin_left="auto",
-        ),
-        width="100%",
-        justify_content="between",
-        align_items="center",
-        margin_top="15px",
-    ),
+                    # === SECCIÓN SUBTOTAL Y ENVÍO ===
+                    rx.box(
+                    # Subtotal sin envío
+                        rx.hstack(
+                            rx.text("Subtotal (sin envío):", font_weight="bold", color="black"),
+                            rx.text(
+                            CartState.total_text,
+                            font_weight="bold",
+                            color="#000",
+                            margin_left="auto",
+                            ),
+                            width="100%",
+                            justify_content="between",
+                            align_items="center",
+                            margin_top="15px",
+                        ),
 
-    # Título medios de envío
-    rx.hstack(
-        rx.icon(tag="truck", color="#000"),
-        rx.text("Medios de envío", font_weight="bold", color="black"),
-        spacing="2",
-        margin_top="10px",
-    ),
+                        # Título medios de envío
+                        rx.hstack(
+                            rx.icon(tag="truck", color="#000"),
+                            rx.text("Medios de envío", font_weight="bold", color="black"),
+                            spacing="2",
+                            margin_top="10px",
+                        ),
 
-    # Campo de código postal + botón calcular
-    rx.hstack(
-        rx.input(
-            placeholder="Tu código postal",
-            width="60%",
-            border_radius="8px",
-            border="1px solid #ccc",
-            padding="5px",
-            bg="white",
-            color="black",
-            
-        ),
-        rx.button(
-            "CALCULAR",
-            bg="#000",
-            color="#fff",
-            padding_x="12px",
-            padding_y="5px",
-            border_radius="8px",
-            cursor="pointer",
-            _hover={"background_color": "#222"},
-        ),
-        spacing="2",
-        margin_top="8px",
-    ),
+                        # Campo de código postal + botón calcular
+                        rx.hstack(
+                            rx.input(
+                                placeholder="Tu código postal",
+                                width="60%",
+                                border_radius="8px",
+                                border="1px solid #ccc",
+                                padding="5px",
+                                bg="white",
+                                color="black",
+                            ),
+                            rx.button(
+                                "CALCULAR",
+                                bg="#000",
+                                color="#fff",
+                                padding_x="12px",
+                                padding_y="5px",
+                                border_radius="8px",
+                                cursor="pointer",
+                                _hover={"background_color": "#222"},
+                            ),
+                            spacing="2",
+                            margin_top="8px",
+                        ),
 
-    # Link “No sé mi código postal”
-    rx.link(
-        "No sé mi código postal",
-        href="https://www.correoargentino.com.ar/formularios/cpa",
-        font_size="13px",
-        color="#000",
-        text_decoration="underline",
-        margin_top="4px",
-    ),
+                        # Link “No sé mi código postal”
+                        rx.link(
+                            "No sé mi código postal",
+                            href="https://www.correoargentino.com.ar/formularios/cpa",
+                            font_size="13px",
+                            color="#000",
+                            text_decoration="underline",
+                            margin_top="4px",
+                        ),
 
-    # Opción “Nuestro local”
-    rx.hstack(
-        rx.icon(tag="store", color="#000"),
-        rx.text("Nuestro local", font_weight="bold", color="black"),
-        spacing="2",
-        margin_top="15px",
-    ),
+                        # Opción “Nuestro local”
+                        rx.hstack(
+                            rx.icon(tag="store", color="#000"),
+                            rx.text("Nuestro local", font_weight="bold", color="black"),
+                            spacing="2",
+                            margin_top="15px",
+                        ),
 
-    # Dirección del local
-    rx.box(
-        rx.text(
-            "Delta Store  Av. Circunvalación Santiago Marzo Este 868 entre Argentino Valle e Independencia (Santa Rosa, La Pampa) – Lunes a Viernes 9:30 a 12:30 / 16:00 a 21:00 – Sábado 11 a 19 hs",
-            font_size="13px",
-            color="#000",
-        ),
-        rx.text("Gratis", font_weight="bold", color="black", margin_top="4px"),
-        border="1px solid #ccc",
-        border_radius="10px",
-        padding="10px",
-        margin_top="5px",
-    ),
-                    #TOTAL DE LA COMPRA
-                    rx.text(
-                        CartState.total_text,
-                        font_weight="bold",
-                        font_size="18px",
-                        color="#DAA520",
-                        margin_top="10px",
-                    ),
-                    rx.button(
-                        "INICIAR COMPRA",
-                        bg="#DAA520",
-                        color="black",
+                        # Dirección del local
+                        rx.box(
+                            rx.text(
+                                "Delta Store  Av. Circunvalación Santiago Marzo Este 868 entre Argentino Valle e Independencia (Santa Rosa, La Pampa) – Lunes a Viernes 9:30 a 12:30 / 16:00 a 21:00 – Sábado 11 a 19 hs",
+                                font_size="13px",
+                                color="#000",
+                            ),
+                            rx.text("Gratis", font_weight="bold", color="black", margin_top="4px"),
+                                border="1px solid #ccc",
+                                border_radius="10px",
+                                padding="10px",
+                                margin_top="5px",
+                        ),
+                        #TOTAL DE LA COMPRA
+                        rx.text(
+                            CartState.total_text,
+                            font_weight="bold",
+                            font_size="18px",
+                            color="#DAA520",
+                            margin_top="10px",
+                        ),
+                        rx.button(
+                            "INICIAR COMPRA",
+                            bg="#DAA520",
+                            color="black",
+                            width="100%",
+                            border_radius="8px",
+                            padding_y="12px",
+                            font_weight="bold",
+                            _hover={"transform": "scale(1.05)", "cursor": "pointer"},
+                        ),
+                        spacing="2",
+                        align="start",
+                        padding="20px",
                         width="100%",
-                        border_radius="8px",
-                        padding_y="12px",
-                        font_weight="bold",
-                        _hover={"transform": "scale(1.05)", "cursor": "pointer"},
                     ),
-                    spacing="4",
-                    align="start",
-                    padding="20px",
+                    position="fixed",
+                    top="0",
+                    right="0",
+                    width="400px",
+                    height="100vh",
+                    bg="white",
+                    box_shadow="-2px 0 10px rgba(0,0,0,0.3)",
+                    z_index="1200",
+                    animation="slideIn 0.4s ease forwards",
                 ),
-                position="fixed",
-                top="0",
-                right="0",
-                width="400px",
-                height="100vh",
-                bg="white",
-                box_shadow="-2px 0 10px rgba(0,0,0,0.3)",
-                z_index="1200",
-                animation="slideIn 0.4s ease forwards",
-            ),
-            style={
-                "@keyframes slideIn": {
-                    "from": {"right": "-400px"},
-                    "to": {"right": "0"},
+                style={
+                    "@keyframes slideIn": {
+                        "from": {"right": "-400px"},
+                        "to": {"right": "0"},
                 }
             },
         ),
         rx.box(),
-    )
+    ),
 )
 
 
@@ -765,7 +784,7 @@ rx.box(
                                 bg="#DAA520",
                                 color="white",
                                 _hover={"transform": "scale(1.05)"},
-                                on_click=lambda _: CartState.toggle_cart_modal(nombre=nombre, imagen=src),
+                                on_click=lambda _: CartState.toggle_cart_modal(nombre=nombre, imagen=src, precio=precio),
                             ),
                             rx.link(
                                 "Ver más detalle",
