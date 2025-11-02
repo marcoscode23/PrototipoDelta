@@ -14,6 +14,37 @@ class CartState(rx.State):
     @rx.var
     def total_items(self) -> int:
         return len(self.cart_items)
+    
+
+    def select_image(self, img: str):
+        self.selected_image = img
+
+
+    # === Propiedad para el precio seleccionado con formato ($90.000) ===
+    @rx.var
+    def formatted_selected_price(self) -> str:
+        # Formatea el precio del producto seleccionado con punto de miles.
+        precio_entero = int(self.selected_price)
+        formatted_price = f"{precio_entero:,}"
+        formatted_price = formatted_price.replace(",", ".")
+        return f"${formatted_price}"
+        
+    # ropiedad computada para formatear todos los ítems del carrito
+    @rx.var
+    def formatted_cart_items(self) -> list[dict]:
+        formatted_list = []
+        for item in self.cart_items:
+            # Función local para el formateo de precios
+            def format_price(price):
+                precio_entero = int(price)
+                formatted_price = f"{precio_entero:,}"
+                return f"${formatted_price.replace(',', '.')}"
+
+            # Crea una copia del ítem y le añade el precio formateado
+            formatted_item = item.copy()
+            formatted_item["precio_formateado"] = format_price(item["precio"])
+            formatted_list.append(formatted_item)
+        return formatted_list
 
     def toggle_cart_modal(self, e: rx.event.PointerEventInfo | None = None, nombre: str = "", imagen: str = "", precio: str = ""):
         self.show_modal = not self.show_modal
@@ -22,7 +53,7 @@ class CartState(rx.State):
         if imagen:
             self.selected_image = imagen
         if precio:
-            # ✅ Convertimos precio a float aunque venga como "$80.000"
+            # Convertimos precio a float aunque venga como "$80.000"
             if isinstance(precio, str):
                 precio = precio.replace("$", "").replace(".", "").replace(",", ".").strip()
             try:
@@ -30,7 +61,7 @@ class CartState(rx.State):
             except ValueError:
                 self.selected_price = 0.0
     
-    # 🧮 Función para calcular el total
+    # Función para calcular el total
     def get_total(self) -> float:
         total = 0.0
         for item in self.cart_items:
@@ -43,7 +74,7 @@ class CartState(rx.State):
             total += precio * int(item["cantidad"])
         return total
     
-    # ✅ NUEVA PROPIEDAD REACTIVA (automáticamente se actualiza)
+    # NUEVA PROPIEDAD REACTIVA (automáticamente se actualiza)
     @rx.var
     def total_text(self) -> str:
         # Usamos el formato de miles y luego reemplazamos la coma por el punto.
@@ -54,8 +85,8 @@ class CartState(rx.State):
         return f"Total: ${formatted_total}"
     
     
-    def select_size(self, talle: int | str):
-        self.selected_size = str(talle)
+    def select_size(self, talle: int):
+        self.selected_size = (talle)
     
     def set_quantity(self,value: str):
         try:
@@ -124,7 +155,7 @@ def cart_modal() -> rx.Component:
                             margin_top="10px",
                         ),
                         rx.text(
-                            CartState.selected_price,
+                            CartState.formatted_selected_price,
                             font_size="18px",
                             color="#DAA520",
                             font_weight="bold",
@@ -167,6 +198,8 @@ def cart_modal() -> rx.Component:
                                 text_align="center",
                                 border="1px solid #ccc",
                                 border_radius="6px",
+                                bg="white",
+                                color="black",
                                 on_change=CartState.set_quantity,
                             ),
                             justify="center",
@@ -236,7 +269,7 @@ def cart_modal() -> rx.Component:
         rx.box(),  # nada si está cerrado
     ),
 
-# ===================== CARRITO LATERAL =====================
+# ===== CARRITO LATERAL =====
 def cart_drawer() -> rx.Component:
     return rx.cond(
         CartState.show_cart_drawer,
@@ -272,7 +305,7 @@ def cart_drawer() -> rx.Component:
                         justify="between",
                         width="100%",
                     ),
-                    # AÑADIDO: Textos PRODUCTO y SUBTOTAL
+                    # PRODUCTO y SUBTOTAL
                     rx.hstack(
                         rx.text("PRODUCTO", font_size="14px", font_weight="bold", color="black"),
                         rx.spacer(),
@@ -285,7 +318,7 @@ def cart_drawer() -> rx.Component:
                     rx.scroll_area(
                         rx.vstack(
                             rx.foreach(
-                                CartState.cart_items,
+                                CartState.formatted_cart_items,
                                 lambda item, i: rx.hstack(
                                     # === COLUMNA IZQUIERDA ===
                                     rx.hstack(
@@ -318,7 +351,7 @@ def cart_drawer() -> rx.Component:
                                     rx.vstack(
                                         rx.hstack(
                                             rx.text(
-                                                f"${item['precio']}",
+                                                item["precio_formateado"],
                                                 color="#DAA520",
                                                 font_weight="bold",
                                                 font_size="15px",
@@ -332,11 +365,10 @@ def cart_drawer() -> rx.Component:
                                             ),
                                             align="center",
                                         ),
-                                        margin_top="0px",  # 👈 baja el bloque debajo de SUBTOTAL
+                                        margin_top="0px", 
                                         align_items="end",
                                         padding_right="15px",
                                     ),
-                                    # === ESTILO GENERAL DE CADA ITEM ===
                                     spacing="4",
                                     align="start",
                                     padding_y="10px",
@@ -367,7 +399,6 @@ def cart_drawer() -> rx.Component:
                             align_items="center",
                             margin_top="15px",
                         ),
-
                         # Título medios de envío
                         rx.hstack(
                             rx.icon(tag="truck", color="#000"),
@@ -375,7 +406,6 @@ def cart_drawer() -> rx.Component:
                             spacing="2",
                             margin_top="10px",
                         ),
-
                         # Campo de código postal + botón calcular
                         rx.hstack(
                             rx.input(
@@ -575,7 +605,7 @@ def products() -> rx.Component:
     productos = [
         ("VANSKNUSKOOL.png", "VANS KNU SKOOL #793", "$50.000", "$60.500 con efectivo (en el local)"),
         ("VANSUHYLANE.png", "VANS U HYLANE", "$80.000", "$60.500 con efectivo (en el local)"),
-        ("puma 180.png", "PUMA", "$90.000", "$67.500 con efectivo (en el local)"),
+        ("puma 180.png", "PUMA 180", "$90.000", "$67.500 con efectivo (en el local)"),
         ("SAMBAXLG.png", "SAMBA XLG", "$80.000", "$60.000 con efectivo (en el local)"),
         ("AIRFORCE.png", "AIR FORCE", "$80.000", "$60.000 con efectivo (en el local)"),
         ("CAMPUSXBADBUNNY.png","CAMPUS X BAD BUNNY","$90.000","$67.500 con efectivo (en el local)"),
@@ -601,6 +631,10 @@ def products() -> rx.Component:
         ("DROPSTEPLOW854.png","DROP STEP LOW 853","$90.000","$67.500 con efectivo (en el local)"),
         ("OSIRIS870.png","OSIRIS 870","$90.000","$67.500 con efectivo (en el local)"),
         ("JORDAN1821.png","JORDAN 1 #821","$90.000","$67.500 con efectivo (en el local)"),
+        ("ADIDASFORUMLOW446.png","ADIDAS FORUM LOW 446","$90.000","$67.500 con efectivo (en el local)"),
+        ("JORDAN1LOWTRAVISSCOTTREVERSE.png","JORDAN 1 LOW TRAVIS SCOTT REVERSE","$90.000","$67.500 con efectivo (en el local)"),
+        ("NEWBALANCE550.png","NEW BALANCE 550","$90.000","$67.500 con efectivo (en el local)"),
+        ("NEWBALANCE906060.png","NEW BALANCE 9060","$90.000","$67.500 con efectivo (en el local)"),
     ]
     
     return rx.box(
@@ -617,7 +651,7 @@ def products() -> rx.Component:
                     padding_x=["10px","50px"],  
                     height="auto",              
                     bg="white",                 
-                    wrap="wrap",  # evita que se desborde en celular
+                    wrap="wrap",  
                     spacing="4",                
                 ),
             ),
@@ -670,9 +704,10 @@ def products() -> rx.Component:
                                 width="200px", 
                                 height="250px",
                                 border_radius="8px",
-                                _hover={"transform": "scale(1.05)", "cursor": "pointer"}
+                                _hover={"transform": "scale(1.05)", "cursor": "pointer"},
+                                on_click=lambda _, src=src: CartState.select_image(src),
                             ),
-                            href=f"/detalle/{normalize_nombre(nombre)}"
+                            href=f"/detalle/{normalize_nombre(nombre)}",
                         ),
                         rx.text(nombre, font_size="14px", font_weight="medium",color="black"),
                         rx.text(precio, font_size="16px", font_weight="bold", color="black"),
@@ -709,9 +744,9 @@ def products() -> rx.Component:
                     max_width="400px",
                     width=("calc(45%)","calc(38%)"),
                     min_width="220",
-                    bg="transparent",  # sin fondo
-                    border="none",     # sin borde
-                    box_shadow="none", # sin sombra
+                    bg="transparent",  
+                    border="none",     
+                    box_shadow="none", 
                     align="center",
                     justify="center",
                 )
@@ -761,9 +796,10 @@ rx.box(
             on_click=rx.call_script(
                 """
                 const container = document.getElementById('promos');
-                if (container) container.scrollBy({left: 300, behavior: 'smooth'});
+                if (container) container.scrollBy({left: -300, behavior: 'smooth'});
                 """
             ),
+            display=["none", "flex"],
         ),
         rx.scroll_area(
             rx.hstack(
@@ -817,11 +853,21 @@ rx.box(
             
             ),
             width="80%",
-            overflow_x="auto",
+            overflow_x="hidden",
             white_space="nowrap",
             scroll_behavior="smooth",
             id="promos",
+            sx={
+                "&::-webkit-scrollbar": {"height": "8px"},
+                "&::-webkit-scrollbar-thumb": {
+                    "background": "#DAA520",
+                    "border_radius": "10px",
+                },
+                "&::-webkit-scrollbar-thumb:hover": {"background": "#b8860b"},
+                "&::-webkit-scrollbar-track": {"background": "#DAA520" },
+            }
         ),
+        # --- BOTÓN DERECHO ---
         rx.icon_button(
             rx.icon(tag="chevron_right", size=28),
             bg="white",
@@ -834,6 +880,7 @@ rx.box(
                 if (container) container.scrollBy({left: 300, behavior: 'smooth'});
                 """
             ),
+            display=["none", "flex"],
         ),
         justify="center",
         align="center",

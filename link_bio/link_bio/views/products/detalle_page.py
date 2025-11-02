@@ -1,5 +1,5 @@
 import reflex as rx
-
+from .products import CartState, normalize_nombre
 
 # Función para normalizar nombre de producto
 def normalize_nombre(nombre: str):
@@ -7,9 +7,9 @@ def normalize_nombre(nombre: str):
 
 # Diccionario local con imágenes extra
 IMAGENES_EXTRA = {
-    "VANS_KNU_SKOOLL_793": ["VANSKNUSKOOLL.png", "AIRFORCE.png"],
+    "VANS_KNU_SKOOL_793": ["VANSKNUSKOOLL.png", "AIRFORCE.png"],
     "VANS_U_HYLANE": ["VANSUHYLANE.png", "VANSUHYLANE.png"],
-    "PUMA": ["OSIRIS870.png", "OSIRIS870.png"],
+    "PUMA 180": ["link_bio/assets/puma 180.png", "link_bio/assets/puma 180.png"],
     "SAMBA_XLG": ["SAMBAXLG.png", "SAMBAXLGG.png"],
     "AIR_FORCE": ["AIRFORCE.png", "AIRFORCE.png"],
     "CAMPUS_X_BAD_BUNNY": ["CAMPUSXBADBUNNYY.png", "CAMPUSXBADBUNNY783.png"],
@@ -63,14 +63,22 @@ def detalle_page(nombre: str = None) -> rx.Component:
                 # ---- Galería de imágenes ----
                 rx.vstack(
                     *[
-                        rx.image(src=img, width="80px", height="80px", border_radius="8px", _hover={"transform": "scale(1.1)"})
+                        rx.image(
+                            src=img, 
+                            width="80px",
+                            height="80px", 
+                            border_radius="8px",
+                            _hover={"transform": "scale(1.1)"},
+                            on_click=lambda _, src=img: CartState.select_image(src),
+                        )
                         for img in imagenes
                     ],
                     spacing="2",
                     align="center",
                 ),
                 # Imagen principal grande
-                rx.image(src=imagenes[4], width=["100%","400px"], height="400px", border_radius="10px"),
+                rx.image(
+                    src=CartState.select_image or imagenes[0], width=["100%","400px"], height="400px", border_radius="10px"),
                 spacing="5",
                 wrap="wrap",
                 justify="center",
@@ -86,7 +94,16 @@ def detalle_page(nombre: str = None) -> rx.Component:
                 # Selector de talle
                 rx.hstack(
                     rx.text("TALLE:", font_weight="bold"),
-                    *[rx.button(str(t), bg="white", border="1px solid #ccc", _hover={"bg":"black", "color":"white"}) for t in talles],
+                    *[
+                        rx.button(
+                            str(t), 
+                            bg="white", 
+                            border="1px solid #ccc", 
+                            _hover={"bg":"black", "color":"white"},
+                            on_click=lambda _, talle=t: CartState.select_size(talle),
+                        ) 
+                        for t in talles
+                    ],
                     spacing="2",
                 ),
                 
@@ -113,7 +130,12 @@ def detalle_page(nombre: str = None) -> rx.Component:
 
                 # Botón agregar al carrito
                 rx.button("AGREGAR AL CARRITO", bg="black", color="white", size="4", width="100%", margin_top="15px",
-                    _hover={"transform": "scale(1.05)"}
+                    _hover={"transform": "scale(1.05)"},
+                    on_click=lambda _: CartState.toggle_cart_modal(
+                        nombre=nombre,
+                        imagen=imagenes[0],
+                        precio=precio
+                    ),
                 ),
 
                 # Info de local
