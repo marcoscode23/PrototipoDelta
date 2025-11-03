@@ -1,5 +1,10 @@
 import reflex as rx
 
+
+# Función para normalizar nombre de producto
+def normalize_nombre(nombre: str):
+    return nombre.upper().replace(" ", "_").replace("#","").replace("-","_")
+
 class CartState(rx.State):
     show_modal: bool = False
     show_cart_drawer: bool = False
@@ -10,6 +15,7 @@ class CartState(rx.State):
     quantity: int = 0
     cart_items: list[dict] = []
     
+
     # === Propiedad computada: cantidad total en el carrito ===
     @rx.var
     def total_items(self) -> int:
@@ -596,12 +602,10 @@ def account_links() -> rx.Component:
         width="100%",           
     ),
 
-# Función para normalizar nombre de producto
-def normalize_nombre(nombre: str):
-    return nombre.upper().replace(" ", "_").replace("#","").replace("-","_")
 
 # ---- PRODUCTOS ----
 def products() -> rx.Component:
+    
     productos = [
         ("VANSKNUSKOOL.png", "VANS KNU SKOOL #793", "$50.000", "$60.500 con efectivo (en el local)"),
         ("VANSUHYLANE.png", "VANS U HYLANE", "$80.000", "$60.500 con efectivo (en el local)"),
@@ -839,7 +843,7 @@ rx.box(
                         margin_x="10px",
                         min_width="220px",
                     )
-                    for src, nombre, precio in [
+                    for src, nombre, precio in  [
                         ("sb-dunk-low-premium-00494.png", "SB DUNK LOW PREMIUN 00494 ", "$40.000,00"),
                         ("vans-classic-sin-plataforma-nacionales-107.png", "VANS CLASSIC (SIN PLATAFORMA) NACIONALES", "$40.000,00"),
                         ("converse-all-star-718.png", "CONVERSE ALL STAR 718", "$49.000"),

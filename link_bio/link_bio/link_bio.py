@@ -9,6 +9,7 @@ from link_bio.views.products.detalle_page import detalle_page
 from link_bio.views.cuentas.login import login
 from link_bio.views.cuentas.register import register
 from link_bio.views.cuentas.reset_password import reset_password
+from link_bio.utils import normalize_nombre
 
 
 
@@ -49,10 +50,9 @@ app = rx.App()
 app.add_page(index, route="/")
 app.add_page(products, route="/products")
 app.add_page(arrepentimiento, route="/arrepentimiento")
-app.add_page(detalle_page, route="/detalle/[nombre]")
 app.add_page(login, route="/login")
 app.add_page(register, route="/register")
 app.add_page(reset_password, route="/reset_password")
-
+app.add_page(lambda **kwargs: detalle_page(**kwargs), route="/detalle/[nombre]")
 app._compile()
 
