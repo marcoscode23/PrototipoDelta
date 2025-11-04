@@ -3,9 +3,6 @@ from link_bio.utils import normalize_nombre
 from .products import CartState
 
 
-
-# Lista de productos (copiada de tu código 'products')
-# En una aplicación real, esta lista debería estar en un módulo de datos o en el estado.
 PRODUCTOS_DATA = [
     ("VANSKNUSKOOL.png", "VANS KNU SKOOL #793", "$50.000", "$60.500 con efectivo (en el local)"),
     ("VANSUHYLANE.png", "VANS U HYLANE", "$80.000", "$60.500 con efectivo (en el local)"),
@@ -53,14 +50,12 @@ def get_product_details(normalized_name: str) -> dict:
             }
     return None
 
-# Definición del PageState para manejar la carga de datos en la página de detalle
+
 class DetallePageState(CartState):
 
-    # La ruta actual se obtiene automáticamente del contexto
+    
     @rx.var
     def normalized_product_name(self) -> str:
-        # La ruta en la URL será algo como /detalle/[nombre_normalizado]
-        # rx.State.router.page.params["producto"] es la parte dinámica de la ruta
         return self.router.page.params.get("nombre", "")
 
     @rx.var
@@ -69,9 +64,9 @@ class DetallePageState(CartState):
 
 # Componente para el detalle del producto
 def detalle_producto(details: dict) -> rx.Component:
-    talles = ["40", "41", "35", "36", "37", "38"] # Tallas de ejemplo, pueden venir de la base de datos
+    talles = ["40", "41", "35", "36", "37", "38"] 
     
-    # Prepara los datos para la función toggle_cart_modal
+    
     producto_nombre = details["nombre"]
     producto_imagen = details["imagen"]
     producto_precio = details["precio"]
@@ -84,19 +79,19 @@ def detalle_producto(details: dict) -> rx.Component:
                     rx.button(
                         "« Volver a Productos", 
                         font_size="16px",
-                        color="white",             # texto blanco
-                        bg="#DAA520",              # fondo dorado
+                        color="white",             
+                        bg="#DAA520",              
                         border_radius="30px",
                         font_weight="bold",
                         border="2px solid #DAA520",
-                        transition="all 0.2s ease-in-out",  # suaviza la animación
+                        transition="all 0.2s ease-in-out",  
                         _hover={
-                            "bg": "#C49000",                # tono dorado más oscuro
-                            "transform": "scale(1.05)",     # agranda un poco al pasar el mouse
+                            "bg": "#C49000",                
+                            "transform": "scale(1.05)",     
                         },
                     ),
-                    href="/products", # Asume que la lista de productos está en la ruta /productos
-                    margin_bottom=["20px", "30px"], # Menos margen en móvil
+                    href="/products", 
+                    margin_bottom=["20px", "30px"], 
                 ),
                 
 
@@ -110,9 +105,9 @@ def detalle_producto(details: dict) -> rx.Component:
                                 width=["90%", "450px"],
                                 
                                 box_shadow="lg",
-                                height=["auto", "auto"], # ← mantiene proporción
+                                height=["auto", "auto"], 
                                 border_radius="12px",
-                                object_fit="contain",   # ← CAMBIO: evita deformación
+                                object_fit="contain",   
                                 margin_bottom=["20px", "0"],
                             ),
                         ),
@@ -163,7 +158,7 @@ def detalle_producto(details: dict) -> rx.Component:
                                 bg="#DAA520",
                                 size="4",
                                 font_weight="bold",
-                                flex_grow=1, # Ocupa el espacio restante
+                                flex_grow=1, 
                                 _hover={"transform": "scale(1.02)", "bg": "#C49000"},
                                 on_click=DetallePageState.add_to_cart,
                                 is_disabled=rx.cond(DetallePageState.quantity < 1, True, False), # Deshabilita si la cantidad es 0
@@ -214,7 +209,7 @@ def detalle_page() -> rx.Component:
             rx.image(
                 src="/fondo1.png",
                 margin_top="30px",
-                width=["70%", "300px"],  # más chico en escritorio
+                width=["70%", "300px"],  
             ),
         ),
         rx.cond(
@@ -235,9 +230,9 @@ def detalle_page() -> rx.Component:
         # === PIE DE PÁGINA ===
         rx.center(
             rx.box(
-                border_top="0.5px solid #e0e0e0",  # más delgada y más clara
+                border_top="0.5px solid #e0e0e0",  
                 width="80%",
-                margin_y="1em",                    # menos separación
+                margin_y="1em",                   
             ),
         ),
         rx.center(
