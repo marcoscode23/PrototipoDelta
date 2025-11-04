@@ -55,6 +55,7 @@ def get_product_details(normalized_name: str) -> dict:
 
 # Definición del PageState para manejar la carga de datos en la página de detalle
 class DetallePageState(CartState):
+
     # La ruta actual se obtiene automáticamente del contexto
     @rx.var
     def normalized_product_name(self) -> str:
@@ -74,28 +75,50 @@ def detalle_producto(details: dict) -> rx.Component:
     producto_nombre = details["nombre"]
     producto_imagen = details["imagen"]
     producto_precio = details["precio"]
-    
-    return rx.center(
+
+    return rx.container(
         rx.box(
             rx.vstack(
                 # Enlace para volver
                 rx.link(
-                    rx.button("« Volver a Productos", font_size="16px", color="#DAA520", border_radius="30px", font_weight="bold", bg="transparent", border="2px solid #DAA520"),
+                    rx.button(
+                        "« Volver a Productos", 
+                        font_size="16px",
+                        color="white",             # texto blanco
+                        bg="#DAA520",              # fondo dorado
+                        border_radius="30px",
+                        font_weight="bold",
+                        border="2px solid #DAA520",
+                        transition="all 0.2s ease-in-out",  # suaviza la animación
+                        _hover={
+                            "bg": "#C49000",                # tono dorado más oscuro
+                            "transform": "scale(1.05)",     # agranda un poco al pasar el mouse
+                        },
+                    ),
                     href="/products", # Asume que la lista de productos está en la ruta /productos
-                    margin_bottom="30px",
+                    margin_bottom=["20px", "30px"], # Menos margen en móvil
                 ),
+                
 
                 # Contenido principal: Imagen y Detalles
-                rx.hstack(
+                rx.flex(
                     # Columna de la Imagen
                     rx.box(
-                        rx.image(
-                            src=producto_imagen,
-                            width="100%",
-                            max_width="450px",
-                            border_radius="8px",
-                            box_shadow="lg",
+                        rx.vstack(
+                            rx.image(
+                                src=f"/{producto_imagen}",
+                                width=["90%", "450px"],
+                                
+                                box_shadow="lg",
+                                height=["auto", "auto"], # ← mantiene proporción
+                                border_radius="12px",
+                                object_fit="contain",   # ← CAMBIO: evita deformación
+                                margin_bottom=["20px", "0"],
+                            ),
                         ),
+                        # Centra la imagen en vista móvil
+                        display="flex",
+                        justify_content="center",
                         width=["100%", "50%"],
                     ),
 
@@ -107,16 +130,18 @@ def detalle_producto(details: dict) -> rx.Component:
                         # Precio en efectivo
                         rx.text(details["efectivo"], font_size="18px", font_weight="bold", color="#DAA520"),
                         
-                        rx.divider(margin_y="20px"),
+                        
 
                         # Selección de Talla
-                        rx.text("TALLE:", font_size="18px", font_weight="medium"),
+                        rx.text("TALLES:", font_size="18px", font_weight="medium",color="black"),
                         rx.flex(
                             *[
                                 rx.button(
                                     talle,
                                     size="3",
                                     color_scheme="yellow",
+                                    color="black",
+                                    border_radius="5px",
                                     variant=rx.cond(
                                         DetallePageState.selected_size == talle,
                                         "solid", # Seleccionado
@@ -129,60 +154,172 @@ def detalle_producto(details: dict) -> rx.Component:
                             ],
                             spacing="3",
                             margin_bottom="20px",
+                            wrap="wrap",
                         ),
-                        
-                        # Cantidad y Botón de Carrito
                         rx.hstack(
-                            rx.input(
-                                placeholder="Cantidad",
-                                type="number",
-                                value=DetallePageState.quantity,
-                                on_change=DetallePageState.set_quantity,
-                                width="100px",
-                                min="1",
-                            ),
                             rx.button(
                                 "AGREGAR AL CARRITO",
                                 color="white",
                                 bg="#DAA520",
                                 size="4",
+                                font_weight="bold",
+                                flex_grow=1, # Ocupa el espacio restante
                                 _hover={"transform": "scale(1.02)", "bg": "#C49000"},
                                 on_click=DetallePageState.add_to_cart,
                                 is_disabled=rx.cond(DetallePageState.quantity < 1, True, False), # Deshabilita si la cantidad es 0
                             ),
-                            spacing="4",
+                            # Cantidad y Botón de Carrito
+                            rx.input(
+                                placeholder="Cantidad",
+                                type="number",
+                                value=DetallePageState.quantity,
+                                on_change=DetallePageState.set_quantity,
+                                width="150px",
+                                min="1",
+                                
+                            ),
+                            spacing="3",
+                            align="center",
+                            width="100%",
                         ),
-
+                        spacing="2",
                         width=["100%", "50%"],
                         padding_left=["0", "40px"],
+                        align="start",
                     ),
+                    
                     spacing="5",
                     align="start",
-                    direction=("column"), # Stack vertical en móvil, horizontal en escritorio
+                    justify="center",
+                    
                 ),
                 width="100%",
-                max_width="1200px",
+                max_width="1100px",
                 padding="20px",
             ),
             width="100%",
+            bg="white",
+            border_radius="16px",
+            box_shadow="lg",
+            padding="30px",
         ),
-        padding_y="50px",
+        padding_y="40px",             
+        min_height="100vh",
     )
 
 
 def detalle_page() -> rx.Component:
-    # Muestra el detalle del producto si se encuentra, si no, muestra un mensaje de error.
-    return rx.cond(
-        DetallePageState.product_details,
-        detalle_producto(DetallePageState.product_details),
+    return rx.vstack(
         rx.center(
-            rx.vstack(
-                rx.heading("Producto No Encontrado", size="4"),
-                rx.link(
-                    rx.button("Volver a Productos", bg="#DAA520", color="white"),
-                    href="/products",
-                ),
+            rx.image(
+                src="/fondo1.png",
+                margin_top="30px",
+                width=["70%", "300px"],  # más chico en escritorio
             ),
-            height="80vh",
         ),
+        rx.cond(
+            DetallePageState.product_details,
+            detalle_producto(DetallePageState.product_details),
+            rx.center(
+                rx.vstack(
+                    rx.heading("Producto No Encontrado", size="4"),
+                    rx.link(
+                        rx.button("Volver a Productos", bg="#DAA520", color="white",size="4",_hover={"transform": "scale(1.02)", "bg": "#C49000"}),
+                        href="/products",
+                    ),
+                ),
+                height="80vh",
+            ),
+        ),
+
+        # === PIE DE PÁGINA ===
+        rx.center(
+            rx.box(
+                border_top="0.5px solid #e0e0e0",  # más delgada y más clara
+                width="80%",
+                margin_y="1em",                    # menos separación
+            ),
+        ),
+        rx.center(
+            rx.image(src="/delta.png", margin_top="30px", width=["100%", "auto"]),
+        ),
+        rx.box(
+            rx.hstack(
+                # Navegación
+                rx.vstack(
+                    rx.text("NAVEGACIÓN", weight="bold", color="white", font_size="15px"),
+                    rx.link("Inicio", href="/", color="white"),
+                    rx.link("Productos", href="/products", color="white"),
+                    rx.link("Contacto", href="https://wa.me/543794258727?text=Hola%20Delta%20Store%20👋%2C%20quiero%20consultar%20por%20unas%20zapatillas.", color="white"),
+                    spacing="2",
+                    align="start",
+                ),
+                # Medios de pago
+                rx.vstack(
+                    rx.text("MEDIOS DE PAGO", weight="bold", color="white", font_size="15px"),
+                    rx.image(src="/tarjetas.png", height="100px"),
+                    rx.center(
+                        rx.vstack(
+                            rx.text("FORMAS DE ENVÍO", weight="bold", font_size="14px", color="white"),
+                            rx.image(src="/correoargentino@2x.png", height="30px"),
+                            rx.link("SEGUIMIENTO DE ENVIOS", href="https://www.correoargentino.com.ar/formularios/e-commerce", color="white", font_size="15px", weight="bold"),
+                            spacing="2",
+                        ),
+                    ),
+                    bg="black",
+                    padding_bottom="20px",
+                    spacing="2",
+                    align="start",
+                ),
+                # Contacto
+                rx.vstack(
+                    rx.text("CONTACTANOS", weight="bold", color="white", font_size="15px"),
+                    rx.hstack(rx.icon("phone", color="white", size=16), rx.text("02954 806873", color="white")),
+                    rx.hstack(rx.icon("mail", color="white", size=16), rx.text("shoesdeltastore@gmail.com", color="white")),
+                    rx.hstack(rx.icon("map-pin", color="white", size=16), rx.text("JUNIN 868", color="white")),
+                    spacing="1",
+                    align="start",
+                ),
+                # Redes + Newsletter
+                rx.vstack(
+                    rx.text("REDES SOCIALES", weight="bold", color="white", font_size="15px"),
+                    rx.link(rx.icon("instagram", color="white", size=22), href="https://www.instagram.com", is_external=True),
+                    rx.text("NEWSLETTER", weight="bold", color="white", font_size="15px", margin_top="10px"),
+                    rx.hstack(
+                        rx.input(placeholder="shoesdeltastore@gmail.com", width="150px", height="35px"),
+                        rx.button(rx.icon("send"), bg="white", color="black"),
+                    ),
+                    spacing="2",
+                    align="start",
+                ),
+                justify="center",
+                align="start",
+                padding="40px",
+                bg="black",
+                wrap="wrap",
+            ),
+            width="100%",
+        ),
+        rx.center(
+            rx.text("COPYRIGHT DELTA STORE - 2025. TODOS LOS DERECHOS RESERVADOS", color="black", font_size="12px"),
+            bg="white",
+            padding_y="10px",
+            border_top="1px solid #333",
+            text_align="center",
+            justify="center",
+        ),
+        rx.center(
+            rx.text("DEFENSA DE LAS Y LOS CONSUMIDORES. PARA RECLAMOS ", color="black", font_size="12px", display="inline", style={"whiteSpace": "nowrap"}),
+        ),
+        rx.center(
+            rx.link("INGRESÁ ACÁ.", href="https://autogestion.produccion.gob.ar/consumidores", color="black", font_size="12px", font_weight="bold", text_decoration="none", display="inline", margin_right="5px", _hover={"text_decoration": "underline"}),
+        ),
+        padding_y="20px",
+        width="100%",
+        align="center",
+        justify="center",
+        wrap="wrap",
+        row_gap="40px",
+        bg="white",
     )
+
