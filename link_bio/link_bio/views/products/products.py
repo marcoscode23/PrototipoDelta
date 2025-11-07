@@ -113,7 +113,8 @@ class CartState(rx.State):
         self.cart_items.append(item)
         self.show_modal = False
         self.show_cart_drawer = True
-
+        return rx.redirect("/products")
+    
     # --- Eliminar producto del carrito ---
     def remove_from_cart(self, index: int):
         if 0 <= index < len(self.cart_items):

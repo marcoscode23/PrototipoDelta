@@ -52,6 +52,23 @@ def get_product_details(normalized_name: str) -> dict:
 
 
 class DetallePageState(CartState):
+    selected_size: str = ""
+    selected_price: float = 0.0
+    quantity: int = 1
+    show_success: bool = False
+    
+    def on_load(self):
+        """Se ejecuta al cargar la página de detalle."""
+        self.show_success = False
+
+    def select_size(self, talle: int):
+        self.selected_size = int(talle)
+
+    def set_quantity(self,value: str):
+        try:
+            self.quantity = max(1, int(value))
+        except ValueError:
+            self.quantity = 0
 
     
     @rx.var
@@ -61,15 +78,36 @@ class DetallePageState(CartState):
     @rx.var
     def product_details(self) -> dict | None:
         return get_product_details(self.normalized_product_name)
+        
+    def add_to_cart_event(self, details: dict):
+        self.selected_product = details["nombre"]
+        self.selected_image = details["imagen"]
+        
+        raw_price = details.get("precio", 0)
+        price_str = str(raw_price)
+
+        if isinstance(raw_price, str):
+            cleaned = (
+                raw_price.replace("$", "")
+                .replace(".", "")
+                .replace(",", ".")
+                .strip()
+            )
+        try:
+            self.selected_price = float(cleaned) if cleaned else 0.0
+        except ValueError:
+            self.selected_price = 0.0
+    
+        self.add_to_cart()
+
+        # Mostrar mensaje de éxito
+        self.show_success = True
+
 
 # Componente para el detalle del producto
-def detalle_producto(details: dict) -> rx.Component:
-    talles = ["40", "41", "35", "36", "37", "38"] 
-    
-    
+def detalle_producto(details: dict) -> rx.Component: 
     producto_nombre = details["nombre"]
     producto_imagen = details["imagen"]
-    producto_precio = details["precio"]
 
     return rx.container(
         rx.box(
@@ -93,7 +131,6 @@ def detalle_producto(details: dict) -> rx.Component:
                     href="/products", 
                     margin_bottom=["20px", "30px"], 
                 ),
-                
 
                 # Contenido principal: Imagen y Detalles
                 rx.flex(
@@ -103,7 +140,6 @@ def detalle_producto(details: dict) -> rx.Component:
                             rx.image(
                                 src=f"/{producto_imagen}",
                                 width=["90%", "450px"],
-                                
                                 box_shadow="lg",
                                 height=["auto", "auto"], 
                                 border_radius="12px",
@@ -122,61 +158,161 @@ def detalle_producto(details: dict) -> rx.Component:
                         rx.text(producto_nombre, font_size=["24px", "36px"], font_weight="extrabold", color="black"),
                         rx.text(details["precio"], font_size=["28px", "48px"], font_weight="bold", color="black", margin_top="10px"),
                         
+                        # Precio sin impuestos
+                        rx.text("Precio sin impuestos $74.380,17", font_size="14px", color="gray"),
+                        
                         # Precio en efectivo
                         rx.text(details["efectivo"], font_size="18px", font_weight="bold", color="#DAA520"),
                         
+                        # Cuotas
+                        rx.box(
+                            rx.text("3 CUOTAS SIN INTERÉS DE $30.000,00", font_weight="bold", color="black", bg="white", padding="8px", border="2px solid black", border_radius="6px"),
+                            margin_top="10px",
+                        ),
+                        rx.link(
+                            rx.image(
+                            src="/tarjeta1.png"),
+                        ),
+                        rx.text(
+                            rx.text("25% de descuento", as_="span", font_weight="bold"),
+                            rx.text("pagando con Efectivo (en el local)", as_="span"),
+                            color="black",
+                            font_size=["0.85rem", "1rem"],
+                            line_height="1.2",
+                            margin_top="8px",
+                            text_align="center",
+                            white_space="nowrap",
+                        ),
+                        rx.link(
+                            "VER MEDIOS DE PAGO", 
+                            href="#", 
+                            font_size="14px", 
+                            color="black", 
+                            text_decoration="underline", 
+                            margin_bottom="10px"
+                        ),
                         
-
-                        # Selección de Talla
+                        rx.divider(border_color="black", border_width="1px", margin_y="10px"),
+                        
+                        # Selección de Talle
                         rx.text("TALLES:", font_size="18px", font_weight="medium",color="black"),
-                        rx.flex(
+                        rx.hstack(
                             *[
-                                rx.button(
-                                    talle,
-                                    size="3",
-                                    color_scheme="yellow",
-                                    color="black",
-                                    border_radius="5px",
-                                    variant=rx.cond(
-                                        DetallePageState.selected_size == talle,
-                                        "solid", # Seleccionado
-                                        "outline", # No seleccionado
+                                rx.box(
+                                    rx.text(str(talle), font_size="16px"),
+                                    border="1px solid #DAA520",
+                                    border_radius="8px",
+                                    padding="5px 10px",
+                                    cursor="pointer",
+                                    bg=rx.cond(
+                                        CartState.selected_size == talle,
+                                        "#DAA520",
+                                        "transparent",
                                     ),
-                                    on_click=lambda t=talle: DetallePageState.select_size(t),
-                                    _hover={"bg": "#F3E5AB"},
+                                    color=rx.cond(
+                                        CartState.selected_size == talle,
+                                        "white",
+                                        "black",
+                                    ),
+                                    on_click=lambda: CartState.select_size(talle),
+                                    _hover={"bg": "#DAA520", "color": "white"},
                                 )
-                                for talle in talles
+                                for talle in [38, 39, 40, 41, 42, 43]
                             ],
                             spacing="3",
-                            margin_bottom="20px",
-                            wrap="wrap",
+                            justify="center",
+                            margin_top="10px",
                         ),
-                        rx.hstack(
+
+                            # Cantidad y Botón de Carrito
+                            rx.text("Cantidad", font_size="16px", font_weigth="bold", color="black"),
+                            rx.vstack(
+                                rx.input(
+                                    placeholder="Cantidad",
+                                    value=CartState.quantity,
+                                    color="black",
+                                    type="number",
+                                    on_change=DetallePageState.set_quantity,
+                                    width="150px",
+                                    
+                                ),
+                                rx.text("¡No te lo pierdas, es el último!", font_weigth="blod", color="black"),
+                                
+                            ),
+                            rx.text("1 en stock", font_size="14px", color="gray"),
+                            
                             rx.button(
                                 "AGREGAR AL CARRITO",
                                 color="white",
                                 bg="#DAA520",
                                 size="4",
                                 font_weight="bold",
-                                flex_grow=1, 
+                                width="100%",
+                                margin_top="10px",
                                 _hover={"transform": "scale(1.02)", "bg": "#C49000"},
-                                on_click=DetallePageState.add_to_cart,
+                                on_click=DetallePageState.add_to_cart_event(details),
                                 is_disabled=rx.cond(DetallePageState.quantity < 1, True, False), # Deshabilita si la cantidad es 0
                             ),
-                            # Cantidad y Botón de Carrito
-                            rx.input(
-                                placeholder="Cantidad",
-                                type="number",
-                                value=DetallePageState.quantity,
-                                on_change=DetallePageState.set_quantity,
-                                width="150px",
-                                min="1",
+                            rx.cond(
+                                DetallePageState.show_success,
+                                rx.text(
+                                    "✅ Tu producto se cargó correctamente.",
+                                    color="green",
+                                    font_weight="bold",
+                                    margin_top="10px",
+                                ),
+                            ),
+                            #Sección Medios de Envío
+                            rx.hstack(
+                                rx.icon(tag="truck", color="black"),
+                                rx.text("Medios de envío", font_weigth="bold", color="black"),
+                                align="center",
+                                spacing="2",
+                                margin_top="20px",
+                            ),
+                            rx.divider(),
+                            
+                            rx.hstack(
+                                rx.input(placeholder="Tu código postal", width="60%", color="black"),
+                                rx.button("Calcular", bg="#DAA520", border="1px solid black", font_weigth="bold"),
+                                width="100%",
+                                spacing="3",
+                            ),
+                            rx.link(
+                                rx.text("No sé mi código postal", font_size="14px", color="black"),
+                                href="https://www.correoargentino.com.ar/formularios/cpa",
+                            ),
+                            rx.hstack(
+                                rx.icon(tag="store",color="black"),
+                                rx.text("Nuestro local", font_weigth="bold", color="black"),
+                                align="center",
+                                spacing="2",
+                                margin_top="20px",
+                            ),
+                            rx.box(
+                                rx.hstack(
+                                    rx.text(
+                                        "Delta Store  Av. Circunvalación Santiago Marzo Este 868 entre Argentino Valle e Independencia (Santa Rosa, La Pampa) – Lunes a Viernes 9:30 a 12:30 / 16:00 a 21:00 - Sábado 11 a 19:00 hs",
+                                        font_size="14px",
+                                        color="black",
+                                        width="80%",
+                                    ),
+                                    rx.text("Gratis", font_weigth="bold", color="black", text_align="right", width="80%"),
+                                    align="center",
+                                    justify="between",
+                                ),
+                                border="1px solid black",
+                                border_radius="8px",
+                                padding="10px",
+                                width="100%",
+                                bg="white",
+                            ),
+                            rx.image(
+                                src="/tienda2.png",
+                                width="100%",
+                                height="auto",
                                 
                             ),
-                            spacing="3",
-                            align="center",
-                            width="100%",
-                        ),
                         spacing="2",
                         width=["100%", "50%"],
                         padding_left=["0", "40px"],
@@ -205,19 +341,38 @@ def detalle_producto(details: dict) -> rx.Component:
 
 def detalle_page() -> rx.Component:
     return rx.vstack(
+        # === CABECERA ===
+        rx.hstack(
+            rx.text(
+                "25% OFF EFECTIVO - 20% OFF TRANSFERENCIA",
+                height="50px",
+                font_size="11px",
+                padding="19px",
+                
+            ),
+            justify="center",
+            bg="black",
+            width="100%",
+        ),
+        # === CONTENIDO PRINCIPAL ===
         rx.center(
             rx.image(
                 src="/fondo1.png",
                 margin_top="30px",
-                width=["70%", "300px"],  
+                width=["90%", "500px"],
+                height="auto",
+                object_fit="contain",
             ),
+        ),
+        rx.center(
+            rx.image(src="/delta.png", margin_top="10px", width=["70%", "auto"]),
         ),
         rx.cond(
             DetallePageState.product_details,
             detalle_producto(DetallePageState.product_details),
             rx.center(
                 rx.vstack(
-                    rx.heading("Producto No Encontrado", size="4"),
+                    rx.heading("Producto No Encontrado", size="4", color="black"),
                     rx.link(
                         rx.button("Volver a Productos", bg="#DAA520", color="white",size="4",_hover={"transform": "scale(1.02)", "bg": "#C49000"}),
                         href="/products",
@@ -236,7 +391,7 @@ def detalle_page() -> rx.Component:
             ),
         ),
         rx.center(
-            rx.image(src="/delta.png", margin_top="30px", width=["100%", "auto"]),
+            rx.image(src="/delta.png", margin_top="10px", width=["100%", "auto"]),
         ),
         rx.box(
             rx.hstack(
@@ -316,5 +471,6 @@ def detalle_page() -> rx.Component:
         wrap="wrap",
         row_gap="40px",
         bg="white",
+        on_mount=DetallePageState.on_load,
     )
 
