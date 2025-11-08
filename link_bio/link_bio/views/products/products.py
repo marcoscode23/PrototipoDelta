@@ -604,6 +604,96 @@ def account_links() -> rx.Component:
     ),
 
 
+# --- Estilos ---
+nav_item_style = {
+    "color": "white",
+    "font_weight": "bold",
+    "padding_x": "1em",
+    "padding_y": "0.5em",
+    "_hover": {"background_color": "#2a2a2a", "cursor": "pointer"},
+}
+
+menu_item_style = {
+    "color": "white",
+    "background_color": "black",
+    "_hover": {"background_color": "#2a2a2a", "cursor": "pointer"},
+}
+
+
+# --- Submenú ZAPATILLAS ---
+def submenu_zapatillas() -> rx.Component:
+    return rx.menu.root(
+        rx.menu.trigger(
+            rx.hstack(
+                rx.text("ZAPATILLAS", color="white"),
+                rx.icon(tag="chevron-right", size=16, color="white"),
+                justify="between",
+                width="100%",
+            ),
+            _hover={"background_color": "#2a2a2a"},
+            bg="black",
+            padding_x="1em",
+            padding_y="0.5em",
+            border_radius="none",
+        ),
+        rx.menu.sub_content(
+            rx.menu.item("RUNNING", **menu_item_style),
+            rx.menu.item("URBANAS", **menu_item_style),
+            bg="black",
+            border="none",
+            side_offset=5,
+        ),
+    )
+
+
+# --- Menú PRODUCTOS ---
+def menu_productos() -> rx.Component:
+    return rx.menu.root(
+        rx.menu.trigger(
+            rx.text("PRODUCTOS", **nav_item_style),
+        ),
+        rx.menu.content(
+            rx.menu.item("ZAPATILLAS - RUNNING", **menu_item_style),
+            rx.menu.item("ZAPATILLAS - URBANAS", **menu_item_style),
+            rx.menu.item("IMPORTADAS", **menu_item_style),
+            rx.menu.item("NACIONALES", **menu_item_style),
+            rx.menu.item("DEPORTIVAS", **menu_item_style),
+            bg="black",
+            border="none",
+            min_width="220px",
+        ),
+    )
+
+
+# --- HEADER + NAVBAR (combinados) ---
+def header() -> rx.Component:
+    return rx.center(
+        # Barra de navegación centrada
+        rx.box(
+            rx.hstack(
+                rx.link(rx.text("INICIO", **nav_item_style), href="/"),
+                menu_productos(),
+                rx.link(
+                    rx.text("CONTACTO", **nav_item_style),
+                    href="https://wa.me/543794258727?text=Hola%20Delta%20Store%20👋%2C%20quiero%20consultar%20por%20unas%20zapatillas.",
+                ),
+                direction="row",
+                justify="center",
+                align="center",
+                spacing="4",
+            ),
+            background_color="black",
+            width=["90%", "60%", "40%"],
+            padding_y="1em",
+            border_bottom="2px solid white",
+            border_radius="12px",
+            margin_top="20px",
+            box_shadow="0px 0px 10px rgba(0,0,0,0.3)",
+            font_weight="bold",
+        ),
+    )
+
+
 # ---- PRODUCTOS ----
 def products() -> rx.Component:
     
@@ -641,8 +731,8 @@ def products() -> rx.Component:
         ("NEWBALANCE550.png","NEW BALANCE 550","$90.000","$67.500 con efectivo (en el local)"),
         ("NEWBALANCE906060.png","NEW BALANCE 9060","$90.000","$67.500 con efectivo (en el local)"),
     ]
-    
-    return rx.box(
+
+    return rx.vstack(
         # --- HEADER DE PRODUCTOS ---
         rx.box(
             rx.center(
@@ -675,6 +765,8 @@ def products() -> rx.Component:
             z_index="10",
             box_shadow="0 2px 5px rgba(0,0,0,0.2)",
             ),
+            header(),
+
             rx.center(
                 rx.image(
                     src="delta.png",

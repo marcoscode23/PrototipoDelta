@@ -1,65 +1,5 @@
 import reflex as rx 
 
-
-# --- Estilos ---
-nav_item_style = {
-    "color": "white",
-    "font_weight": "bold",
-    "padding_x": "1em",
-    "padding_y": "0.5em",
-    "_hover": {"background_color": "#2a2a2a", "cursor": "pointer"},
-}
-
-menu_item_style = {
-    "color": "white",
-    "background_color": "black",
-    "_hover": {"background_color": "#2a2a2a", "cursor": "pointer"},
-}
-
-
-# --- Submenú ZAPATILLAS ---
-def submenu_zapatillas() -> rx.Component:
-    return rx.menu.sub(
-        rx.menu.sub_trigger(
-            rx.hstack(
-                rx.text("ZAPATILLAS", color="white"),
-                rx.icon("chevron-right", size=16, color="white"),
-                justify="between",   
-                width="100%",
-            ),
-            bg="black",
-            padding_x="1em",
-            padding_y="0.5em",
-            border_radius="none",
-            _hover={"background_color": "#2a2a2a"},
-        ),
-        rx.menu.sub_content(
-            rx.menu.item("RUNNING", **menu_item_style),
-            rx.menu.item("URBANAS", **menu_item_style),
-            bg="black",
-            border="none",
-        ),
-    )
-
-
-# --- Menú PRODUCTOS ---
-def menu_productos() -> rx.Component:
-    return rx.menu.root(
-        rx.menu.trigger(
-            rx.text("PRODUCTOS", **nav_item_style),
-        ),
-        rx.menu.content(
-            submenu_zapatillas(),
-            rx.menu.item("IMPORTADAS", **menu_item_style),
-            rx.menu.item("NACIONALES", **menu_item_style),
-            rx.menu.item("DEPORTIVAS", **menu_item_style),
-            bg="black",
-            border="none",
-            min_width="200px",
-        ),
-    )
-
-
 # --- HEADER + NAVBAR (combinados) ---
 def header() -> rx.Component:
     return rx.vstack(
@@ -67,7 +7,7 @@ def header() -> rx.Component:
         rx.image(
             src="/logo_tienda.png",
             width="400px",
-            max_windth="90%", 
+            max_windth=["90%","400px"], 
             margin_top="50px",
         ),
         rx.text(
@@ -79,27 +19,74 @@ def header() -> rx.Component:
             margin_top="0.8em",
             padding_x="10px",
         ),
-
-        # Barra de navegación debajo del logo
+        # --- GALERÍA DESLIZABLE (imágenes y videos) ---
         rx.box(
             rx.hstack(
-                rx.link(rx.text("INICIO", **nav_item_style), href="/"),
-                menu_productos(),
-                rx.link(rx.text("CONTACTO", **nav_item_style),href="https://wa.me/543794258727?text=Hola%20Delta%20Store%20👋%2C%20quiero%20consultar%20por%20unas%20zapatillas."),
-                direction="row",
-                justify="center",
-                align="center",
+                rx.foreach(
+                    [
+                        # Lista de contenido (imágenes y videos)
+                        {"tipo": "imagen", "src": "/📍 9 DE JULIO 318 ESQ. VILLEGAS _Shop online 24_7 ---_ www.deltastreet.com.ar 💻_🛒(JPG).jpg"},
+                        {"tipo": "imagen", "src": "/🔥𝗟𝗮 𝗯𝗼𝗹𝘀𝗶𝘁𝗮 𝗾𝘂𝗲 𝗾𝘂𝗲𝗿𝗲𝗺𝗼𝘀 𝘁𝗼𝗱𝗼𝘀 𝗽𝗮𝗿𝗮  𝗮𝗿𝗿𝗮𝘀𝗮𝗿 (.jpg"},
+                        {"tipo": "video", "src": "/🔥𝗟𝗮 𝗯𝗼𝗹𝘀𝗶𝘁𝗮 𝗾𝘂𝗲 𝗾𝘂𝗲𝗿𝗲𝗺𝗼𝘀 𝘁𝗼𝗱𝗼𝘀 𝗽𝗮𝗿𝗮  𝗮𝗿𝗿𝗮𝘀𝗮𝗿 (.mp4"},
+                    ],
+                    lambda item: rx.cond(
+                        item["tipo"] == "imagen",
+                        rx.image(
+                            src=item["src"],
+                            width=["85%","350px"],
+                            height="auto",
+                            object_fit="contain",
+                            border_radius="15px",
+                            flex_shrink="0",
+                            transition="transform 0.5s ease-in-out",
+                            _hover={"transform": "scale(1.05)"},
+                        ),
+                        rx.video(
+                            src=item["src"],
+                            width=["85%","350px"],
+                            height="auto",
+                            border_radius="15px",
+                            object_fit="contain",
+                            controls=True,
+                            auto_play=True,
+                            muted=True,
+                            loop=True,
+                            plays_inline=True,
+                            flex_shrink="0",
+                        ),
+                    ),
+                ),
                 spacing="4",
-            
+                overflow_x="auto",
+                overflow_y="hidden",
+                scroll_snap_type="x mandatory",
+                css={
+                    "& > *": {"scroll_snap_align": "center",},
+                    # 🔹 Scroll suave y compatible con iOS
+                    "scroll-behavior": "smooth",
+                    "-webkit-overflow-scrolling": "touch",
+                    # 🔹 Oculta scrollbars en todos los navegadores
+                    "&::-webkit-scrollbar": {"display": "none"},
+                    "scrollbar-width": "none",  # Firefox
+                },
+                
+                justify="start",
+                align="center",
+                width="max-content",
+                padding_left="5vw",  # 🔹 centra visualmente las imágenes
+                padding_right="5vw",
             ),
-            background_color="black",
-            width=["90%","60%","40%"],
-            padding_y="1em",
-            border_bottom="2px solid white",
-            border_radius="12px",
-            margin_top="20px",
-            box_shadow="0px 0px 10px rgba(0,0,0,0.3)",
-            font_wieght="bold",
+            width="100%",
+            overflow_x="auto",
+            overflow_y="hidden",
+            padding_y="30px",
+            display="flex",
+            justify_content="center",
+            css={
+                "overflow": "hidden",
+                "&::-webkit-scrollbar": {"display": "none"},  # también oculta la del contenedor principal
+                "scrollbar-width": "none",
+            }
         ),
         rx.vstack(
             rx.center(
@@ -117,8 +104,8 @@ def header() -> rx.Component:
                         width="400px",
                         height="auto",
                         border_radius="15px",
-                        transition="transform 0.6s ease-in-out",
-                        _hover={"transform": "scale(1.1)"}, #zoom sueve
+                        transition="transform 0.5s ease-in-out",
+                        _hover={"transform": "scale(1.05)"}, #zoom sueve
                     ),
                     
                 ),
