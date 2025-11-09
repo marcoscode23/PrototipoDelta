@@ -16,7 +16,55 @@ class CartState(rx.State):
     cart_items: list[dict] = []
     
 
-    # === Propiedad computada: cantidad total en el carrito ===
+    # --- Agregar estas propiedades y métodos dentro de tu clase CartState ---
+
+    # Datos del comprador / envío
+    buyer_nombre: str = ""
+    buyer_apellido: str = ""
+    buyer_telefono: str = ""
+    buyer_email: str = ""
+    buyer_calle: str = ""
+    buyer_numero: str = ""
+    buyer_departamento: str = ""
+    buyer_barrio: str = ""
+    buyer_ciudad: str = ""
+    buyer_postal: str = ""
+    buyer_dni: str = ""
+    billing_same: bool = True
+    wants_newsletter: bool = False
+    show_selected_panel_mobile: bool = True
+
+    def toggle_selected_panel_mobile(self, e: rx.event.PointerEventInfo | None = None):
+        """Alterna la visibilidad del panel de producto en móviles."""
+        self.show_selected_panel_mobile = not self.show_selected_panel_mobile
+
+    # Datos de tarjeta
+    card_number: str = ""
+    card_holder: str = ""
+    card_expiry: str = ""
+    card_cvc: str = ""
+
+
+    def set_field(self, key: str, value: str):
+        setattr(self, key, value)
+
+
+    def start_checkout(self, e: rx.event.PointerEventInfo | None = None):
+        if not self.cart_items:
+            return
+        return rx.redirect("/checkout")
+
+    
+    def go_to_payment(self, e: rx.event.PointerEventInfo | None = None):
+        if not self.buyer_nombre or not self.buyer_apellido or not self.buyer_telefono:
+            return
+        return rx.redirect("/checkout/payment")
+
+    def confirm_payment(self, e: rx.event.PointerEventInfo | None = None):
+        self.cart_items = []
+        return rx.redirect("/checkout/thankyou")
+
+
     @rx.var
     def total_items(self) -> int:
         return len(self.cart_items)
@@ -26,10 +74,8 @@ class CartState(rx.State):
         self.selected_image = img
 
 
-    # === Propiedad para el precio seleccionado con formato ($90.000) ===
     @rx.var
     def formatted_selected_price(self) -> str:
-        # Formatea el precio del producto seleccionado con punto de miles.
         precio_entero = int(self.selected_price)
         formatted_price = f"{precio_entero:,}"
         formatted_price = formatted_price.replace(",", ".")
@@ -71,7 +117,6 @@ class CartState(rx.State):
     def get_total(self) -> float:
         total = 0.0
         for item in self.cart_items:
-            # si precio viene como string tipo "$80.000", lo limpiamos
             precio = (
                 float(str(item["precio"]).replace("$", "").replace(".", "").replace(",", "."))
                 if isinstance(item["precio"], str)
@@ -140,6 +185,17 @@ def cart_modal() -> rx.Component:
                 z_index="1000",
                 transition="opacity 0.3s ease-in-out",
                 on_click=CartState.toggle_cart_modal,
+            ),
+            # Pequeño indicador visible para debugging/UX
+            rx.box(
+                rx.text("MOSTRANDO", font_weight="bold", color="white"),
+                position="fixed",
+                top="12px",
+                right="12px",
+                bg="#DAA520",
+                padding="6px 10px",
+                border_radius="8px",
+                z_index="1002",
             ),
             # Contenedor modal
             rx.center(
@@ -486,6 +542,7 @@ def cart_drawer() -> rx.Component:
                             padding_y="12px",
                             font_weight="bold",
                             _hover={"transform": "scale(1.05)", "cursor": "pointer"},
+                            on_click=CartState.start_checkout,
                         ),
                         spacing="2",
                         align="start",
@@ -524,8 +581,9 @@ def search_bar() -> rx.Component:
             border_radius="10px",
             border_color="transparent",
             bg="#DAA520",
-            _placeholder={"color": "white"},
-            _focus={"border_color": "transparent","box_shadow":"0 0 0 2px #555"}
+            _placeholder={"color": "black"},
+            _focus={"border_color": "transparent","box_shadow":"0 0 0 2px #555"},
+            _hover={"bg": "#DAA520", "color": "black"},
         ),
         rx.button(
             rx.icon(tag="search"),
@@ -536,7 +594,7 @@ def search_bar() -> rx.Component:
             border_radius="0px 5px 5px 0px",
             height="100%",
             padding_x="10px",
-            _hover={"bg": "#050404", "color": "white"},
+            _hover={"bg": "#444", "color": "black"},
         ),
         spacing="1",
         align_items="center",
@@ -610,13 +668,13 @@ nav_item_style = {
     "font_weight": "bold",
     "padding_x": "1em",
     "padding_y": "0.5em",
-    "_hover": {"background_color": "#2a2a2a", "cursor": "pointer"},
+    "_hover": {"background_color": "#444", "cursor": "pointer"},
 }
 
 menu_item_style = {
     "color": "white",
-    "background_color": "black",
-    "_hover": {"background_color": "#2a2a2a", "cursor": "pointer"},
+    "background_color": "#DAA520",
+    "_hover": {"background_color": "#444", "cursor": "pointer"},
 }
 
 
@@ -630,7 +688,7 @@ def submenu_zapatillas() -> rx.Component:
                 justify="between",
                 width="100%",
             ),
-            _hover={"background_color": "#2a2a2a"},
+            _hover={"background_color": "gray"},
             bg="black",
             padding_x="1em",
             padding_y="0.5em",
@@ -658,7 +716,7 @@ def menu_productos() -> rx.Component:
             rx.menu.item("IMPORTADAS", **menu_item_style),
             rx.menu.item("NACIONALES", **menu_item_style),
             rx.menu.item("DEPORTIVAS", **menu_item_style),
-            bg="black",
+            bg="#DAA520",
             border="none",
             min_width="220px",
         ),
@@ -682,7 +740,7 @@ def header() -> rx.Component:
                 align="center",
                 spacing="4",
             ),
-            background_color="black",
+            background_color="#DAA520",
             width=["90%", "60%", "40%"],
             padding_y="1em",
             border_bottom="2px solid white",

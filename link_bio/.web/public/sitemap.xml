@@ -18,4 +18,13 @@
   <url>
     <loc>http://localhost:3000/reset_password</loc>
   </url>
+  <url>
+    <loc>http://localhost:3000/checkout</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/checkout/payment</loc>
+  </url>
+  <url>
+    <loc>http://localhost:3000/checkout/thankyou</loc>
+  </url>
 </urlset>

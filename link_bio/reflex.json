@@ -1,0 +1,6 @@
+{
+  "frontend": {
+    "install": false,
+    "run": false
+  }
+}

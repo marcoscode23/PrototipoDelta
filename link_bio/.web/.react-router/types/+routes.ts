@@ -14,6 +14,12 @@ type Pages = {
   "/": {
     params: {};
   };
+  "/checkout/thankyou": {
+    params: {};
+  };
+  "/checkout/payment": {
+    params: {};
+  };
   "/detalle/:nombre": {
     params: {
       "nombre": string;
@@ -23,6 +29,9 @@ type Pages = {
     params: {};
   };
   "/reset_password": {
+    params: {};
+  };
+  "/checkout": {
     params: {};
   };
   "/products": {
@@ -44,7 +53,15 @@ type Pages = {
 type RouteFiles = {
   "root.jsx": {
     id: "root";
-    page: "/" | "/detalle/:nombre" | "/arrepentimiento" | "/reset_password" | "/products" | "/register" | "/login" | "/*";
+    page: "/" | "/checkout/thankyou" | "/checkout/payment" | "/detalle/:nombre" | "/arrepentimiento" | "/reset_password" | "/checkout" | "/products" | "/register" | "/login" | "/*";
+  };
+  "routes/[checkout].[thankyou]._index.jsx": {
+    id: "routes/[checkout].[thankyou]._index";
+    page: "/checkout/thankyou";
+  };
+  "routes/[checkout].[payment]._index.jsx": {
+    id: "routes/[checkout].[payment]._index";
+    page: "/checkout/payment";
   };
   "routes/[detalle].$[nombre]._index.jsx": {
     id: "routes/[detalle].$[nombre]._index";
@@ -57,6 +74,10 @@ type RouteFiles = {
   "routes/[reset_password]._index.jsx": {
     id: "routes/[reset_password]._index";
     page: "/reset_password";
+  };
+  "routes/[checkout]._index.jsx": {
+    id: "routes/[checkout]._index";
+    page: "/checkout";
   };
   "routes/[products]._index.jsx": {
     id: "routes/[products]._index";
@@ -82,9 +103,12 @@ type RouteFiles = {
 
 type RouteModules = {
   "root": typeof import("./app/root.jsx");
+  "routes/[checkout].[thankyou]._index": typeof import("./app/routes/[checkout].[thankyou]._index.jsx");
+  "routes/[checkout].[payment]._index": typeof import("./app/routes/[checkout].[payment]._index.jsx");
   "routes/[detalle].$[nombre]._index": typeof import("./app/routes/[detalle].$[nombre]._index.jsx");
   "routes/[arrepentimiento]._index": typeof import("./app/routes/[arrepentimiento]._index.jsx");
   "routes/[reset_password]._index": typeof import("./app/routes/[reset_password]._index.jsx");
+  "routes/[checkout]._index": typeof import("./app/routes/[checkout]._index.jsx");
   "routes/[products]._index": typeof import("./app/routes/[products]._index.jsx");
   "routes/[register]._index": typeof import("./app/routes/[register]._index.jsx");
   "routes/[login]._index": typeof import("./app/routes/[login]._index.jsx");

@@ -10,8 +10,9 @@ from link_bio.views.cuentas.login import login
 from link_bio.views.cuentas.register import register
 from link_bio.views.cuentas.reset_password import reset_password
 from link_bio.utils import normalize_nombre
-
-
+from link_bio.views.products.checkout_contact import checkout_contact
+from link_bio.views.products.checkout_payment import checkout_payment
+from link_bio.views.products.checkout_thanks import checkout_thanks
 
 class State(rx.State):
     pass
@@ -54,5 +55,8 @@ app.add_page(login, route="/login")
 app.add_page(register, route="/register")
 app.add_page(reset_password, route="/reset_password")
 app.add_page(lambda **kwargs: detalle_page(**kwargs), route="/detalle/[nombre]")
+app.add_page(checkout_contact, route="/checkout")
+app.add_page(checkout_payment, route="/checkout/payment")
+app.add_page(checkout_thanks, route="/checkout/thankyou")
 app._compile()
 

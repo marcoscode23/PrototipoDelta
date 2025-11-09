@@ -25,9 +25,11 @@ def header() -> rx.Component:
                 rx.foreach(
                     [
                         # Lista de contenido (imágenes y videos)
-                        {"tipo": "imagen", "src": "/📍 9 DE JULIO 318 ESQ. VILLEGAS _Shop online 24_7 ---_ www.deltastreet.com.ar 💻_🛒(JPG).jpg"},
+                        {"tipo": "imagen", "src": "/imagen2.jpg"},
+                        {"tipo": "imagen", "src": "/deltastreet.jpg"},
                         {"tipo": "imagen", "src": "/🔥𝗟𝗮 𝗯𝗼𝗹𝘀𝗶𝘁𝗮 𝗾𝘂𝗲 𝗾𝘂𝗲𝗿𝗲𝗺𝗼𝘀 𝘁𝗼𝗱𝗼𝘀 𝗽𝗮𝗿𝗮  𝗮𝗿𝗿𝗮𝘀𝗮𝗿 (.jpg"},
                         {"tipo": "video", "src": "/🔥𝗟𝗮 𝗯𝗼𝗹𝘀𝗶𝘁𝗮 𝗾𝘂𝗲 𝗾𝘂𝗲𝗿𝗲𝗺𝗼𝘀 𝘁𝗼𝗱𝗼𝘀 𝗽𝗮𝗿𝗮  𝗮𝗿𝗿𝗮𝘀𝗮𝗿 (.mp4"},
+                        
                     ],
                     lambda item: rx.cond(
                         item["tipo"] == "imagen",
