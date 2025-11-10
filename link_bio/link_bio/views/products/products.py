@@ -11,7 +11,8 @@ class CartState(rx.State):
     selected_product: str = ""
     selected_image: str = ""
     selected_price: float = 0.0
-    selected_size: str = ""
+    # Usamos int para selected_size (talle) porque en la UI se pasan enteros (ej. 40)
+    selected_size: int = 0
     quantity: int = 0
     cart_items: list[dict] = []
     
@@ -28,6 +29,7 @@ class CartState(rx.State):
     buyer_departamento: str = ""
     buyer_barrio: str = ""
     buyer_ciudad: str = ""
+    buyer_provincia: str = ""
     buyer_postal: str = ""
     buyer_dni: str = ""
     billing_same: bool = True
@@ -44,9 +46,123 @@ class CartState(rx.State):
     card_expiry: str = ""
     card_cvc: str = ""
 
+    # Estados para acordeones / contenedores deslizables en checkout
+    shipping_open: bool = False
+    payment_methods_open: bool = True
+    tarjeta_details_open: bool = False
+    transferencia_details_open: bool = False
+    efectivo_options_open: bool = False
+    mercado_pago_open: bool = False
+    cuotas_sin_tarjeta_open: bool = False
+    # Modo edición inline para datos de envío
+    shipping_editing: bool = False
+
 
     def set_field(self, key: str, value: str):
         setattr(self, key, value)
+
+    # Métodos para alternar acordeones
+    def toggle_shipping(self, e: rx.event.PointerEventInfo | None = None):
+        self.shipping_open = not self.shipping_open
+
+    def toggle_shipping_edit(self, e: rx.event.PointerEventInfo | None = None):
+        """Alterna el modo edición inline para la sección de envío."""
+        self.shipping_editing = not self.shipping_editing
+
+    # Propiedades reactivas para mostrar datos de envío formateados en la vista
+    @rx.var
+    def shipping_full_name(self) -> str:
+        parts = [self.buyer_nombre or "", self.buyer_apellido or ""]
+        return " ".join([p for p in parts if p]).strip()
+
+    @rx.var
+    def shipping_email(self) -> str:
+        return self.buyer_email or ""
+
+    @rx.var
+    def shipping_address(self) -> str:
+        parts = [self.buyer_calle or "", self.buyer_numero or ""]
+        addr = " ".join([p for p in parts if p]).strip()
+        if self.buyer_postal:
+            addr = f"{addr}, CP {self.buyer_postal}" if addr else f"CP {self.buyer_postal}"
+        return addr
+
+    @rx.var
+    def shipping_cityprov(self) -> str:
+        parts = [self.buyer_ciudad or "", self.buyer_provincia or ""]
+        return ", ".join([p for p in parts if p]).strip()
+
+    @rx.var
+    def shipping_phone(self) -> str:
+        return self.buyer_telefono or ""
+
+    # Propiedades reactivas para el último ítem del carrito (resumen rápido)
+    @rx.var
+    def last_item_image(self) -> str:
+        if not self.cart_items:
+            return ""
+        return self.cart_items[-1].get("imagen", "")
+
+    @rx.var
+    def last_item_name(self) -> str:
+        if not self.cart_items:
+            return ""
+        return self.cart_items[-1].get("nombre", "")
+
+    @rx.var
+    def last_item_talle(self) -> str:
+        if not self.cart_items:
+            return ""
+        return str(self.cart_items[-1].get("talle", ""))
+
+    @rx.var
+    def last_item_talle_label(self) -> str:
+        t = self.last_item_talle
+        return f"Talle: {t}" if t else ""
+
+    @rx.var
+    def selected_size_label(self) -> str:
+        """Label for the currently selected size in the UI."""
+        if not getattr(self, "selected_size", None):
+            return "Talle: -"
+        return f"Talle: {self.selected_size}"
+
+    @rx.var
+    def last_item_price_formatted(self) -> str:
+        if not self.cart_items:
+            return ""
+        # Use the formatted field if present in formatted_cart_items
+        try:
+            return self.formatted_cart_items[-1].get("precio_formateado", "")
+        except Exception:
+            precio = self.cart_items[-1].get("precio", "")
+            return str(precio)
+
+    @rx.var
+    def last_item_price_or_total(self) -> str:
+        """Return the last item formatted price if available, otherwise the formatted total."""
+        price = self.last_item_price_formatted
+        if price:
+            return price
+        return self.formatted_total_amount
+
+    def toggle_payment_methods(self, e: rx.event.PointerEventInfo | None = None):
+        self.payment_methods_open = not self.payment_methods_open
+
+    def toggle_tarjeta_details(self, e: rx.event.PointerEventInfo | None = None):
+        self.tarjeta_details_open = not self.tarjeta_details_open
+
+    def toggle_transferencia_details(self, e: rx.event.PointerEventInfo | None = None):
+        self.transferencia_details_open = not self.transferencia_details_open
+
+    def toggle_efectivo_options(self, e: rx.event.PointerEventInfo | None = None):
+        self.efectivo_options_open = not self.efectivo_options_open
+
+    def toggle_mercado_pago(self, e: rx.event.PointerEventInfo | None = None):
+        self.mercado_pago_open = not self.mercado_pago_open
+
+    def toggle_cuotas_sin_tarjeta(self, e: rx.event.PointerEventInfo | None = None):
+        self.cuotas_sin_tarjeta_open = not self.cuotas_sin_tarjeta_open
 
 
     def start_checkout(self, e: rx.event.PointerEventInfo | None = None):
@@ -134,6 +250,50 @@ class CartState(rx.State):
         formatted_total = f"{total_entero:,}"
         formatted_total = formatted_total.replace(",", ".")
         return f"Total: ${formatted_total}"
+
+    # VARS NUMÉRICAS Y FORMATEADAS ADICIONALES
+    @rx.var
+    def total_amount(self) -> float:
+        """Total numérico sin formatear."""
+        return self.get_total()
+
+    @rx.var
+    def recargo_tarjeta(self) -> float:
+        """Recargo por pagar con tarjeta (5%)."""
+        return self.total_amount * 0.05
+
+    @rx.var
+    def envio_amount(self) -> float:
+        """Importe fijo de envío (en centavos locales)."""
+        return 8889.0
+
+    @rx.var
+    def total_with_fee(self) -> float:
+        return self.total_amount + self.recargo_tarjeta + self.envio_amount
+
+    @rx.var
+    def formatted_total_amount(self) -> str:
+        entero = int(self.total_amount)
+        s = f"{entero:,}".replace(",", ".")
+        return f"${s}"
+
+    @rx.var
+    def formatted_recargo_tarjeta(self) -> str:
+        entero = int(round(self.recargo_tarjeta))
+        s = f"{entero:,}".replace(",", ".")
+        return f"${s}"
+
+    @rx.var
+    def formatted_envio_amount(self) -> str:
+        entero = int(self.envio_amount)
+        s = f"{entero:,}".replace(",", ".")
+        return f"${s}"
+
+    @rx.var
+    def formatted_total_with_fee(self) -> str:
+        entero = int(round(self.total_with_fee))
+        s = f"{entero:,}".replace(",", ".")
+        return f"${s}"
     
     
     def select_size(self, talle: int):
