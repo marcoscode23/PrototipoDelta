@@ -17,8 +17,6 @@ class CartState(rx.State):
     cart_items: list[dict] = []
     
 
-    # --- Agregar estas propiedades y métodos dentro de tu clase CartState ---
-
     # Datos del comprador / envío
     buyer_nombre: str = ""
     buyer_apellido: str = ""
@@ -37,7 +35,7 @@ class CartState(rx.State):
     show_selected_panel_mobile: bool = True
 
     def toggle_selected_panel_mobile(self, e: rx.event.PointerEventInfo | None = None):
-        """Alterna la visibilidad del panel de producto en móviles."""
+        #Alterna la visibilidad del panel de producto en móviles.
         self.show_selected_panel_mobile = not self.show_selected_panel_mobile
 
     # Datos de tarjeta
@@ -66,7 +64,7 @@ class CartState(rx.State):
         self.shipping_open = not self.shipping_open
 
     def toggle_shipping_edit(self, e: rx.event.PointerEventInfo | None = None):
-        """Alterna el modo edición inline para la sección de envío."""
+        #Alterna el modo edición inline para la sección de envío.
         self.shipping_editing = not self.shipping_editing
 
     # Propiedades reactivas para mostrar datos de envío formateados en la vista
@@ -96,7 +94,7 @@ class CartState(rx.State):
     def shipping_phone(self) -> str:
         return self.buyer_telefono or ""
 
-    # Propiedades reactivas para el último ítem del carrito (resumen rápido)
+    # Propiedades reactivas para el último ítem del carrito.
     @rx.var
     def last_item_image(self) -> str:
         if not self.cart_items:
@@ -122,7 +120,6 @@ class CartState(rx.State):
 
     @rx.var
     def selected_size_label(self) -> str:
-        """Label for the currently selected size in the UI."""
         if not getattr(self, "selected_size", None):
             return "Talle: -"
         return f"Talle: {self.selected_size}"
@@ -131,7 +128,6 @@ class CartState(rx.State):
     def last_item_price_formatted(self) -> str:
         if not self.cart_items:
             return ""
-        # Use the formatted field if present in formatted_cart_items
         try:
             return self.formatted_cart_items[-1].get("precio_formateado", "")
         except Exception:
@@ -140,7 +136,6 @@ class CartState(rx.State):
 
     @rx.var
     def last_item_price_or_total(self) -> str:
-        """Return the last item formatted price if available, otherwise the formatted total."""
         price = self.last_item_price_formatted
         if price:
             return price
@@ -188,6 +183,27 @@ class CartState(rx.State):
 
     def select_image(self, img: str):
         self.selected_image = img
+
+    def select_for_detail(self, e: rx.event.PointerEventInfo | None = None, img: str = "", nombre: str = "", precio: str = ""):
+        """Setea el producto seleccionado para la vista de detalle sin abrir modal/drawer.
+
+        Firma: (event?, img, nombre, precio). El evento se acepta primero porque Reflex
+        pasa el evento como primer argumento cuando se usa on_click.
+        Convierte el precio en float de forma segura.
+        """
+        # Si el primer argumento fue pasado en `img` (por compatibilidad), mantenemos flexibilidad
+        # pero la firma prioriza `img` provisto en args.
+        self.selected_image = img
+        self.selected_product = nombre
+        # Convertir precio tipo "$40.000,00" a float 40000.0 con fallback
+        try:
+            value = float(str(precio).replace("$", "").replace(".", "").replace(",", "."))
+        except Exception:
+            try:
+                value = float(str(precio).replace("$", "").replace(",", "."))
+            except Exception:
+                value = 0.0
+        self.selected_price = value
 
 
     @rx.var
@@ -947,7 +963,7 @@ def products() -> rx.Component:
         ("ADIDASFORUMLOW446.png","ADIDAS FORUM LOW 446","$90.000","$67.500 con efectivo (en el local)"),
         ("JORDAN1LOWTRAVISSCOTTREVERSE.png","JORDAN 1 LOW TRAVIS SCOTT REVERSE","$90.000","$67.500 con efectivo (en el local)"),
         ("NEWBALANCE550.png","NEW BALANCE 550","$90.000","$67.500 con efectivo (en el local)"),
-        ("NEWBALANCE906060.png","NEW BALANCE 9060","$90.000","$67.500 con efectivo (en el local)"),
+        ("NEWBALANCE60.png","NEW BALANCE 60","$90.000","$67.500 con efectivo (en el local)"),
     ]
 
     return rx.vstack(
@@ -1121,12 +1137,19 @@ rx.box(
                 *[
                     rx.box(
                         rx.vstack(
-                            rx.image(
-                                src=src,
-                                width="180px",
-                                height="180px",
-                                border_radius="10px",
-                                _hover={"transform": "scale(1.05)", "cursor": "pointer"},
+                            rx.link(
+                                rx.image(
+                                    src=src,
+                                    width="180px",
+                                    height="180px",
+                                    border_radius="10px",
+                                    _hover={"transform": "scale(1.05)", "cursor": "pointer"},
+                                ),
+                                href=f"/detalle/{normalize_nombre(nombre)}",
+                                # Usamos el método de estado que agrupa las asignaciones para evitar
+                                # devolver un event spec inválido desde una lambda.
+                                on_click=CartState.select_for_detail,
+                                args=(src, nombre, precio),
                             ),
                             rx.text(nombre, font_weight="bold", font_size="14px", color="black"),
                             rx.text(precio, font_size="16px", color="#DAA520", font_weight="bold"),

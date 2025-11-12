@@ -97,21 +97,54 @@ def checkout_contact() -> rx.Component:
                         align="start",
                     ),
 
-                    # Right: tarjeta con el producto seleccionado (desktop)
+                    # Right: resumen del carrito (desktop) - muestra los items añadidos al carrito
                     rx.cond(
-                        CartState.selected_product,
+                        CartState.total_items > 0,
                         rx.box(
                             rx.vstack(
-                                rx.image(src=CartState.selected_image, width="220px", height="180px", border_radius="8px"),
-                                rx.text(CartState.selected_product, font_weight="bold", font_size="16px", margin_top="8px", color="black"),
-                                rx.text(rx.cond(CartState.selected_size, f"Talle: {CartState.selected_size}", "Talle: -"), color="#555"),
-                                rx.text(CartState.formatted_selected_price, color="#DAA520", font_weight="bold", font_size="16px", margin_top="6px"),
+                                # Lista compacta de items (muestra todos los items presentes en el carrito)
+                                rx.vstack(
+                                    rx.foreach(
+                                        CartState.formatted_cart_items,
+                                        lambda item, i: rx.hstack(
+                                            rx.hstack(
+                                                rx.image(src=item["imagen"], width="70px", height="70px", border_radius="8px"),
+                                                rx.vstack(
+                                                    rx.text(item["nombre"], font_weight="bold", font_size="14px", color="black"),
+                                                    rx.text(f"Talle: {item.get('talle', '-')}", font_size="13px", color="#555"),
+                                                    rx.text(f"Cantidad: {item.get('cantidad', 1)}", font_size="13px", color="#555"),
+                                                    spacing="1",
+                                                ),
+                                                spacing="3",
+                                            ),
+                                            rx.spacer(),
+                                            rx.text(item.get("precio_formateado", ""), color="#DAA520", font_weight="bold", font_size="14px"),
+                                            spacing="3",
+                                            align="center",
+                                            width="100%",
+                                            padding_y="8px",
+                                            border_bottom="1px solid #eee",
+                                        ),
+                                    ),
+                                    spacing="2",
+                                    width="100%",
+                                ),
+
+                                # Resumen: total y acción
+                                rx.box(
+                                    rx.vstack(
+                                        rx.hstack(rx.text("Total:", font_weight="bold", color="black"), rx.text(CartState.formatted_total_amount, font_weight="bold", color="#DAA520", margin_left="auto")),
+                                        spacing="2",
+                                    ),
+                                    padding_top="10px",
+                                    width="100%",
+                                ),
                             ),
                             padding="12px",
                             border="1px solid #eee",
                             border_radius="10px",
                             bg="#fff",
-                            width=["30%", "260px"],
+                            width=["30%", "320px"],
                             margin_left="20px",
                         ),
                         rx.box(),

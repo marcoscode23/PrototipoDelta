@@ -35,7 +35,7 @@ PRODUCTOS_DATA = [
     ("ADIDASFORUMLOW446.png","ADIDAS FORUM LOW 446","$90.000","$67.500 con efectivo (en el local)"),
     ("JORDAN1LOWTRAVISSCOTTREVERSE.png","JORDAN 1 LOW TRAVIS SCOTT REVERSE","$90.000","$67.500 con efectivo (en el local)"),
     ("NEWBALANCE550.png","NEW BALANCE 550","$90.000","$67.500 con efectivo (en el local)"),
-    ("NEWBALANCE906060.png","NEW BALANCE 9060","$90.000","$67.500 con efectivo (en el local)"),
+    ("NEWBALANCE60.png","NEW BALANCE 60","$90.000","$67.500 con efectivo (en el local)"),
 ]
 
 # Función para obtener los detalles del producto por el nombre normalizado
