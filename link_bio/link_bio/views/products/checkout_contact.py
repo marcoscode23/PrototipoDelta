@@ -7,6 +7,38 @@ def checkout_contact() -> rx.Component:
     return rx.center(
         rx.vstack(
             # Contenedor principal: contiene la versión desktop (hstack) y la versión móvil (box)
+            rx.hstack(
+                rx.text(
+                    "25% OFF EFECTIVO - 20% OFF TRANSFERENCIA",
+                    height="50px",
+                    font_size="11px",
+                    padding="19px",
+                    color="white",
+                    
+                ),
+                justify="center",
+                bg="black",
+                width="100%",
+                margin="0px",
+                padding="0px",
+                position="fixed",
+                top="0",
+                left="0",
+                z_index="1000",
+            ),
+            # === CONTENIDO PRINCIPAL ===
+            rx.center(
+                rx.image(
+                    src="/fondo1.png",
+                    margin_top="30px",
+                    width=["90%", "500px"],
+                    height="auto",
+                    object_fit="contain",
+                ),
+            ),
+            rx.center(
+                rx.image(src="/delta.png", margin_top="10px", width=["70%", "auto"]),
+            ),
             rx.box(
                 # Desktop: form (left) + product card (right). Hidden on mobile
                 rx.hstack(
@@ -221,6 +253,9 @@ def checkout_contact() -> rx.Component:
                 border_radius="12px",
                 box_shadow="0 4px 12px rgba(0,0,0,0.1)",
                 bg="white",
+            ),
+            rx.center(
+                rx.image(src="/delta.png", margin_top="10px", width=["70%", "auto"]),
             ),
 
             # === SECCIÓN INFERIOR: INFORMACIÓN Y CONTACTO (footer) ===

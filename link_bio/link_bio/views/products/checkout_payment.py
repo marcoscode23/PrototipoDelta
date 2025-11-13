@@ -5,6 +5,38 @@ from .products import CartState
 def checkout_payment() -> rx.Component:
     return rx.center(
         rx.vstack(
+            rx.hstack(
+                rx.text(
+                    "25% OFF EFECTIVO - 20% OFF TRANSFERENCIA",
+                    height="50px",
+                    font_size="11px",
+                    padding="19px",
+                    color="white",
+                    
+                ),
+                justify="center",
+                bg="black",
+                width="100%",
+                margin="0px",
+                padding="0px",
+                position="fixed",
+                top="0",
+                left="0",
+                z_index="1000",
+            ),
+            # === CONTENIDO PRINCIPAL ===
+            rx.center(
+                rx.image(
+                    src="/fondo1.png",
+                    margin_top="30px",
+                    width=["90%", "500px"],
+                    height="auto",
+                    object_fit="contain",
+                ),
+            ),
+            rx.center(
+                rx.image(src="/delta.png", margin_top="10px", width=["70%", "auto"]),
+            ),
             # Contenedor principal del formulario con acordeones
             rx.box(
                 rx.vstack(

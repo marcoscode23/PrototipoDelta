@@ -2,8 +2,19 @@ import reflex as rx
 from link_bio.utils import normalize_nombre
 from .products import CartState
 
+PRODUCTOS_PROMOCION = [
+    ("sb-dunk-low-premium-00494.png", "SB DUNK LOW PREMIUN 00494 ", "$40.000,00", "$30.000,00 con efectivo (en el local)"),
+    ("vans-classic-sin-plataforma-nacionales-107.png", "VANS CLASSIC (SIN PLATAFORMA) NACIONALES", "$40.000,00", "$30.000,00 con efectivo (en el local)"),
+    ("converse-all-star-718.png", "CONVERSE ALL STAR 718", "$49.000", "$36.750 con efectivo (en el local)"),
+    ("sb-dunk-low-pro-panda-premium-426.png", "SB DUNK LOW PRO PANDA PREMIUN 426", "$56.000", "$42.000 con efectivo (en el local)"),
+    ("sb-dunk-low-premium2.png", "SB DUNK LOW PREMIUN 2", "$63.000", "$47.250 con efectivo (en el local)"),
+    ("converse-all-star-716.png", "CONVERSE ALL STAR 716", "$56.000,00", "$42.000,00 con efectivo (en el local)"),
+    ("vans-bota-sk8-nacionales-102.png", "VANS BOTA SK8 NACIONALES 102", "$44.000,00", "$33.000,00 con efectivo (en el local)"),
+]
+
 
 PRODUCTOS_DATA = [
+    *PRODUCTOS_PROMOCION,
     ("VANSKNUSKOOL.png", "VANS KNU SKOOL #793", "$50.000", "$60.500 con efectivo (en el local)"),
     ("VANSUHYLANE.png", "VANS U HYLANE", "$80.000", "$60.500 con efectivo (en el local)"),
     ("puma 180.png", "PUMA 180", "$90.000", "$67.500 con efectivo (en el local)"),
@@ -348,11 +359,18 @@ def detalle_page() -> rx.Component:
                 height="50px",
                 font_size="11px",
                 padding="19px",
+                color="white",
                 
             ),
             justify="center",
             bg="black",
             width="100%",
+            margin="0px",
+            padding="0px",
+            position="fixed",
+            top="0",
+            left="0",
+            z_index="1000",
         ),
         # === CONTENIDO PRINCIPAL ===
         rx.center(
@@ -403,11 +421,14 @@ def detalle_page() -> rx.Component:
                     rx.link("Contacto", href="https://wa.me/543794258727?text=Hola%20Delta%20Store%20👋%2C%20quiero%20consultar%20por%20unas%20zapatillas.", color="white"),
                     spacing="2",
                     align="start",
+                    width=["100%", "25%"],
+                    padding_x=["8px", "12px"],
                 ),
                 # Medios de pago
                 rx.vstack(
                     rx.text("MEDIOS DE PAGO", weight="bold", color="white", font_size="15px"),
-                    rx.image(src="/tarjetas.png", height="100px"),
+                    rx.image(src="/tarjetas.png", height=["50px", "100px"]),
+                    # === FORMAS DE ENVÍO ===
                     rx.center(
                         rx.vstack(
                             rx.text("FORMAS DE ENVÍO", weight="bold", font_size="14px", color="white"),
@@ -415,11 +436,13 @@ def detalle_page() -> rx.Component:
                             rx.link("SEGUIMIENTO DE ENVIOS", href="https://www.correoargentino.com.ar/formularios/e-commerce", color="white", font_size="15px", weight="bold"),
                             spacing="2",
                         ),
+                        bg="black",
+                        padding_bottom="20px",
                     ),
-                    bg="black",
-                    padding_bottom="20px",
                     spacing="2",
                     align="start",
+                    width=["100%", "25%"],
+                    padding_x=["8px", "12px"],
                 ),
                 # Contacto
                 rx.vstack(
@@ -429,6 +452,8 @@ def detalle_page() -> rx.Component:
                     rx.hstack(rx.icon("map-pin", color="white", size=16), rx.text("JUNIN 868", color="white")),
                     spacing="1",
                     align="start",
+                    width=["100%", "25%"],
+                    padding_x=["8px", "12px"],
                 ),
                 # Redes + Newsletter
                 rx.vstack(
@@ -441,12 +466,15 @@ def detalle_page() -> rx.Component:
                     ),
                     spacing="2",
                     align="start",
+                    width=["100%", "25%"],
+                    padding_x=["8px", "12px"],
                 ),
                 justify="center",
                 align="start",
-                padding="40px",
+                padding=["20px", "40px"],
                 bg="black",
                 wrap="wrap",
+                spacing="6",
             ),
             width="100%",
         ),
@@ -459,10 +487,25 @@ def detalle_page() -> rx.Component:
             justify="center",
         ),
         rx.center(
-            rx.text("DEFENSA DE LAS Y LOS CONSUMIDORES. PARA RECLAMOS ", color="black", font_size="12px", display="inline", style={"whiteSpace": "nowrap"}),
+            rx.text(
+                "DEFENSA DE LAS Y LOS CONSUMIDORES. PARA RECLAMOS ", 
+                color="black", 
+                font_size="12px", 
+                display="inline", 
+                style={"whiteSpace": "nowrap"}
+            ),
         ),
         rx.center(
-            rx.link("INGRESÁ ACÁ.", href="https://autogestion.produccion.gob.ar/consumidores", color="black", font_size="12px", font_weight="bold", text_decoration="none", display="inline", margin_right="5px", _hover={"text_decoration": "underline"}),
+            rx.link(
+                "INGRESÁ ACÁ.", 
+                href="https://autogestion.produccion.gob.ar/consumidores", 
+                color="black", 
+                font_size="12px", 
+                font_weight="bold", 
+                text_decoration="none", 
+                display="inline", 
+                margin_right="5px", 
+                _hover={"text_decoration": "underline"}),
         ),
         padding_y="20px",
         width="100%",

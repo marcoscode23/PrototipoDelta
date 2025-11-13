@@ -93,7 +93,7 @@ def header() -> rx.Component:
         rx.vstack(
             rx.center(
                 rx.image(
-                    src="delta.png",
+                    src="/cambio.png",
                 ),
             ),
         ),

@@ -1106,6 +1106,7 @@ def products() -> rx.Component:
             ),
             margin_bottom="50px",
         ),
+        
 # === SECCIÓN DE PROMOCIONES DESLIZABLE ===
 rx.box(
     rx.text(
@@ -1241,7 +1242,7 @@ rx.box(
         rx.center(
             rx.image(
                 src="delta.png",
-                margin_top="30px",
+                margin_top="10px",
                 width=["100%", "auto"],              
             ),
         ),
@@ -1256,11 +1257,13 @@ rx.box(
                     rx.link("Contacto", href="https://wa.me/543794258727?text=Hola%20Delta%20Store%20👋%2C%20quiero%20consultar%20por%20unas%20zapatillas.", color="white"),
                     spacing="2",
                     align="start",
+                    width=["100%","25%"],
+                    padding_x=["8px","12px"],
                 ),
                 # Medios de pago
                 rx.vstack(
                     rx.text("MEDIOS DE PAGO", weight="bold", color="white", font_size="15px"),
-                    rx.image(src="/tarjetas.png", height="100px"),
+                    rx.image(src="/tarjetas.png", height=["50px","100px"]),
                 # === FORMAS DE ENVÍO ===
                 rx.center(
                     rx.vstack(
@@ -1268,12 +1271,14 @@ rx.box(
                         rx.image(src="/correoargentino@2x.png", height="30px"),
                         rx.link("SEGUIMIENTO DE ENVIOS",href="https://www.correoargentino.com.ar/formularios/e-commerce",color="white",font_size="15px",weight="bold",),
                         spacing="2",
-                ),
-                bg="black",
-                padding_bottom="20px",
+                    ),
+                    bg="black",
+                    padding_bottom="20px",
                 ),
                 spacing="2", 
                 align="start",
+                width=["100%","25%"],
+                padding_x=["8px","12px"],
                 ),
                 # Contactanos
                 rx.vstack(
@@ -1283,6 +1288,8 @@ rx.box(
                     rx.hstack(rx.icon("map-pin", color="white", size=16), rx.text("JUNIN 868", color="white")),
                     spacing="1",
                     align="start",
+                    width=["100%","25%"],
+                    padding_x=["8px","12px"],
                 ),
                 # Redes + Newsletter
                 rx.vstack(
@@ -1295,12 +1302,15 @@ rx.box(
                     ),
                     spacing="2",
                     align="start",
+                    width=["100%","25%"],
+                    padding_x=["8px","12px"],
                 ),
                 justify="center",
                 align="start",
-                padding="40px",
+                padding=["20px","40px"],
                 bg="black",
                 wrap="wrap",
+                spacing="6",
             ),
             width="100%",
         ),

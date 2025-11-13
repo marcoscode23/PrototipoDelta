@@ -9,7 +9,40 @@ def checkout_thanks() -> rx.Component:
     # Usaremos las vars reactivas de CartState para mostrar montos y evitar operaciones con EventSpec
     tarjeta_pct = 0.05
 
-    return rx.center(
+    return rx.vstack(
+        rx.hstack(
+            rx.text(
+                "25% OFF EFECTIVO - 20% OFF TRANSFERENCIA",
+                height="50px",
+                font_size="11px",
+                padding="19px",
+                color="white",
+            ),
+            justify="center",
+            bg="black",
+            width="100%",
+            margin="0px",
+            padding="0px",
+            position="fixed",
+            top="0",
+            left="0",
+            z_index="1000",
+        ),
+
+        # === CONTENIDO PRINCIPAL (imágenes arriba del todo) ===
+        rx.center(
+            rx.image(
+                src="/fondo1.png",
+                margin_top="30px",
+                width=["90%", "500px"],
+                height="auto",
+                object_fit="contain",
+            ),
+        ),
+        rx.center(
+            rx.image(src="/cambio.png", margin_top="10px", width=["70%", "auto"]),
+        ),
+
         rx.box(
             rx.vstack(
                 rx.text("¡Gracias por tu compra!", font_size="24px", font_weight="bold", color="black"),
@@ -43,6 +76,10 @@ def checkout_thanks() -> rx.Component:
             box_shadow="0 4px 12px rgba(0,0,0,0.1)",
             bg="white",
         ),
+        rx.center(
+            rx.image(src="/delta.png", margin_top="10px", width=["70%", "auto"]),
+        ),
+
 
         # === FOOTER (igual que en checkout_contact) ===
         rx.box(
