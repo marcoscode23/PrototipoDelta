@@ -1,30 +1,30 @@
 <?xml version='1.0' encoding='utf-8'?>
 <urlset xmlns="https://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>http://localhost:3000/</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/products</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/products</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/arrepentimiento</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/arrepentimiento</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/login</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/login</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/register</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/register</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/reset_password</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/reset_password</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/checkout</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/checkout</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/checkout/payment</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/checkout/payment</loc>
   </url>
   <url>
-    <loc>http://localhost:3000/checkout/thankyou</loc>
+    <loc>https://deltastore-teal-wood.reflex.run.reflex.run/checkout/thankyou</loc>
   </url>
 </urlset>

@@ -1,23 +1,12 @@
 import {Fragment,useEffect} from "react"
 import {Box as RadixThemesBox,Button as RadixThemesButton,Flex as RadixThemesFlex,Link as RadixThemesLink,Text as RadixThemesText,TextField as RadixThemesTextField} from "@radix-ui/themes"
-import {isTrue} from "$/utils/state"
-import ReactPlayer from "react-player"
+import {Flex_e2aef5698ea709389b325489e116ab29} from "$/utils/stateful_components"
 import {Link as ReactRouterLink} from "react-router"
 import {Instagram as LucideInstagram,Mail as LucideMail,MapPin as LucideMapPin,Phone as LucidePhone,Send as LucideSend} from "lucide-react"
 import {jsx} from "@emotion/react"
 
 
 
-
-function Flex_e2aef5698ea709389b325489e116ab29 () {
-  
-
-
-
-  return (
-    jsx(RadixThemesFlex,{align:"center",className:"rx-Stack",css:({ ["overflowX"] : "auto", ["overflowY"] : "hidden", ["scrollSnapType"] : "x mandatory", ["css"] : ({ ["& > *"] : ({ ["scrollSnapAlign"] : "center" }), ["scrollBehavior"] : "smooth", ["WebkitOverflowScrolling"] : "touch", ["&::-webkit-scrollbar"] : ({ ["display"] : "none" }), ["scrollbarWidth"] : "none" }), ["width"] : "max-content", ["paddingLeft"] : "5vw", ["paddingRight"] : "5vw" }),direction:"row",justify:"start",gap:"4"},Array.prototype.map.call([({ ["tipo"] : "imagen", ["src"] : "/imagen2.jpg" }), ({ ["tipo"] : "imagen", ["src"] : "/deltastreet.jpg" }), ({ ["tipo"] : "imagen", ["src"] : "/\ud83d\udd25\ud835\udddf\ud835\uddee \ud835\uddef\ud835\uddfc\ud835\uddf9\ud835\ude00\ud835\uddf6\ud835\ude01\ud835\uddee \ud835\uddfe\ud835\ude02\ud835\uddf2 \ud835\uddfe\ud835\ude02\ud835\uddf2\ud835\uddff\ud835\uddf2\ud835\uddfa\ud835\uddfc\ud835\ude00 \ud835\ude01\ud835\uddfc\ud835\uddf1\ud835\uddfc\ud835\ude00 \ud835\uddfd\ud835\uddee\ud835\uddff\ud835\uddee  \ud835\uddee\ud835\uddff\ud835\uddff\ud835\uddee\ud835\ude00\ud835\uddee\ud835\uddff (.jpg" }), ({ ["tipo"] : "video", ["src"] : "/\ud83d\udd25\ud835\udddf\ud835\uddee \ud835\uddef\ud835\uddfc\ud835\uddf9\ud835\ude00\ud835\uddf6\ud835\ude01\ud835\uddee \ud835\uddfe\ud835\ude02\ud835\uddf2 \ud835\uddfe\ud835\ude02\ud835\uddf2\ud835\uddff\ud835\uddf2\ud835\uddfa\ud835\uddfc\ud835\ude00 \ud835\ude01\ud835\uddfc\ud835\uddf1\ud835\uddfc\ud835\ude00 \ud835\uddfd\ud835\uddee\ud835\uddff\ud835\uddee  \ud835\uddee\ud835\uddff\ud835\uddff\ud835\uddee\ud835\ude00\ud835\uddee\ud835\uddff (.mp4" })] ?? [],((item_rx_state_,index_cb7c89e1533f39f1ef1cba12cb423197)=>(jsx(Fragment,{key:index_cb7c89e1533f39f1ef1cba12cb423197},((item_rx_state_?.["tipo"]?.valueOf?.() === "imagen"?.valueOf?.())?(jsx(Fragment,{},jsx("img",{css:({ ["@media screen and (min-width: 0)"] : ({ ["width"] : "85%" }), ["@media screen and (min-width: 30em)"] : ({ ["width"] : "350px" }), ["height"] : "auto", ["objectFit"] : "contain", ["borderRadius"] : "15px", ["flexShrink"] : "0", ["transition"] : "transform 0.5s ease-in-out", ["&:hover"] : ({ ["transform"] : "scale(1.05)" }) }),src:item_rx_state_?.["src"]},))):(jsx(Fragment,{},jsx(ReactPlayer,{controls:true,css:({ ["@media screen and (min-width: 0)"] : ({ ["width"] : "85%" }), ["@media screen and (min-width: 30em)"] : ({ ["width"] : "350px" }), ["height"] : "auto", ["borderRadius"] : "15px", ["objectFit"] : "contain", ["autoPlay"] : true, ["playsInline"] : true, ["flexShrink"] : "0" }),height:null,loop:true,muted:true,src:item_rx_state_?.["src"],width:null},)))))))))
-  )
-}
 
 
 export default function Component() {
