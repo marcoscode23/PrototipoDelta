@@ -45,17 +45,25 @@ def checkout_thanks() -> rx.Component:
 
         rx.box(
             rx.vstack(
+
                 rx.text("¡Gracias por tu compra!", font_size="24px", font_weight="bold", color="black"),
                 rx.text("Tu pago se procesó correctamente.", font_size="16px", color="black"),
                 rx.text("Resumen:", font_weight="semibold", color="black"),
-
+                
+                rx.hstack(rx.text("Producto:", color="black"), rx.text(CartState.selected_product, color=accent, margin_left="auto")),
+                rx.hstack(rx.text("Cantidad:", color="black"), rx.text(CartState.quantity, color=accent, margin_left="auto")),
+                rx.hstack(rx.text("Total del producto:", color="black"), rx.text(CartState.formatted_selected_total, color=accent, font_weight="bold", margin_left="auto")),    
+                
+                rx.divider(margin_y="6px"),
+                
                 # Desglose de montos
                 rx.vstack(
-                    rx.hstack(rx.text("Subtotal:", color="black"), rx.text(CartState.formatted_total_amount, color=accent, font_weight="bold", margin_left="auto")),
                     rx.hstack(rx.text(f"Recargo pago con tarjeta ({int(tarjeta_pct*100)}%):", color="black"), rx.text(CartState.formatted_recargo_tarjeta, color=accent, margin_left="auto")),
                     rx.hstack(rx.text("Envío:", color="black"), rx.text(CartState.formatted_envio_amount, color=accent, margin_left="auto")),
                     rx.divider(margin_y="6px"),
-                    rx.hstack(rx.text("Total a pagar:", font_weight="bold", color="black"), rx.text(CartState.formatted_total_with_fee, color=accent, font_weight="bold", margin_left="auto")),
+                    rx.hstack(
+                        rx.text("Total a pagar:", font_weight="bold", color="black"), 
+                        rx.text(CartState.formatted_total_con_envio, color=accent, font_weight="bold", margin_left="auto")),
                     spacing="2",
                     width="100%",
                 ),

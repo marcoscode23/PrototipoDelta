@@ -55,6 +55,12 @@ class CartState(rx.State):
     # Modo edición inline para datos de envío
     shipping_editing: bool = False
 
+    def go_to_detail(self, e: rx.event.PointerEventInfo | None = None):
+        """Redirige a la página de detalle con el producto seleccionado."""
+        if not self.selected_product:
+            return
+        return rx.redirect(f"/detalle/{normalize_nombre(self.selected_product)}")
+
 
     def set_field(self, key: str, value: str):
         setattr(self, key, value)
@@ -229,6 +235,17 @@ class CartState(rx.State):
             formatted_item["precio_formateado"] = format_price(item["precio"])
             formatted_list.append(formatted_item)
         return formatted_list
+    @rx.var
+    def selected_total(self) -> float:
+        """Total numérico del producto seleccionado (precio * cantidad)."""
+        return self.selected_price * (self.quantity or 1)
+
+    @rx.var
+    def formatted_selected_total(self) -> str:
+        """Total formateado del producto seleccionado."""
+        total_entero = int(self.selected_total)
+        formatted_total = f"{total_entero:,}".replace(",", ".")
+        return f"${formatted_total}"
 
     def toggle_cart_modal(self, e: rx.event.PointerEventInfo | None = None, nombre: str = "", imagen: str = "", precio: str = ""):
         self.show_modal = not self.show_modal
@@ -304,6 +321,19 @@ class CartState(rx.State):
         entero = int(self.envio_amount)
         s = f"{entero:,}".replace(",", ".")
         return f"${s}"
+    
+    @rx.var
+    def total_con_envio(self) -> float:
+        """Suma el total del producto con el envío (sin recargo)."""
+        return self.selected_total + self.envio_amount
+
+    @rx.var
+    def formatted_total_con_envio(self) -> str:
+        """Total formateado (producto + envío)."""
+        entero = int(round(self.total_con_envio))
+        s = f"{entero:,}".replace(",", ".")
+        return f"${s}"
+
 
     @rx.var
     def formatted_total_with_fee(self) -> str:
@@ -344,6 +374,7 @@ class CartState(rx.State):
     # --- Mostrar / ocultar carrito lateral ---  
     def toggle_cart_drawer(self):
         self.show_cart_drawer = not self.show_cart_drawer
+
 
 # ==== MODAL DE CARRITO ====
 def cart_modal() -> rx.Component:
@@ -462,7 +493,7 @@ def cart_modal() -> rx.Component:
                         # Link para ver más detalles
                         rx.link(
                             "Ver más detalle",
-                            href=f"/detalle/{{CartState.selected_product}}",
+                            on_click=CartState.go_to_detail,
                             font_size="14px",
                             color="#DAA520",
                             margin_top="10px",
